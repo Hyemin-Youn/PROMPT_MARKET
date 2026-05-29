@@ -59,7 +59,7 @@ CREATE TABLE purchase (
     purchase_id  BIGINT    NOT NULL AUTO_INCREMENT,
     user_id      BIGINT    NOT NULL,
     prompt_id    BIGINT    NOT NULL,
-    price        INT       NOT NULL,
+    paid_price        INT       NOT NULL,
     purchased_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (purchase_id),
