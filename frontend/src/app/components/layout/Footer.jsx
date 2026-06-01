@@ -1,6 +1,6 @@
 import { Zap } from "lucide-react";
 
-export function Footer() {
+export const Footer = () => {
   return (
     <footer
       className="border-t mt-16"
@@ -78,7 +78,7 @@ export function Footer() {
             © 2026 PromptMart. All rights reserved.
           </p>
           <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
-            응용프로젝트 팀 1조원 · AI 프롬프트 마켓 플랫폼
+            멋쟁이사자처럼 백엔드 과정 응용프로젝트 팀 1조원 · AI 프롬프트 마켓 플랫폼
           </p>
         </div>
       </div>
