@@ -7,7 +7,7 @@ import { LibraryPage } from "./components/LibraryPage.jsx";
 import { AuthModal } from "./components/AuthModal.jsx";
 
 
-export default function App() {
+const App = () => {
   const [page, setPage] = useState("home");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authModal, setAuthModal] = useState(null);
@@ -119,3 +119,5 @@ export default function App() {
       </div>
   );
 }
+
+export default App;
