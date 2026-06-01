@@ -1,15 +1,13 @@
 package com.project.backend.domain.comment.entity;
 
 import com.project.backend.domain.prompt.entity.Prompt;
-import com.project.backend.domain.user.Entity.PromptUser;
+import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comment")
