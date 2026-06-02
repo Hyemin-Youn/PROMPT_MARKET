@@ -170,7 +170,7 @@ export const SettingsPage = ({ isPremium, onLogout, onUpgradePremium }) => {
                       <Crown size={18} style={{ color: isPremium ? "var(--brand-gold)" : "var(--muted-foreground)" }} />
                     </div>
                     <div>
-                      <h2 className="font-medium" style={{ color: "var(--foreground)" }}>{isPremium ? "프리미엄 구독 중" : "무료 플랜"}</h2>
+                      <h2 className="font-medium" style={{ color: "var(--foreground)" }}>{isPremium ? "회원 결제 이용중" : "무료 플랜"}</h2>
                       <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{isPremium ? "다음 결제일 2025-06-20 · 월 29,000원" : "무료 샘플 및 가이드 열람 가능"}</p>
                     </div>
                   </div>
@@ -196,7 +196,7 @@ export const SettingsPage = ({ isPremium, onLogout, onUpgradePremium }) => {
                     </button>
                   )}
                   {isPremium && (
-                    <button className="w-full py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-white/5" style={{ color: "var(--destructive)", border: "1px solid var(--destructive-border-sm)" }}>구독 취소</button>
+                    <button className="w-full py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-white/5" style={{ color: "var(--destructive)", border: "1px solid var(--destructive-border-sm)" }}>결제 취소</button>
                   )}
                 </div>
                 <div className="rounded-xl p-5" style={{ background: "var(--card)", border: "1px solid var(--border-sm)" }}>
