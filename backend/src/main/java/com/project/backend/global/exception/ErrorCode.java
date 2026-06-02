@@ -14,6 +14,11 @@ public enum ErrorCode {
     NOT_FOUND(404, "리소스를 찾을 수 없습니다."),
     INTERNAL_SERVER_ERROR(500, "서버 내부 오류입니다."),
 
+    // 이메일 인증
+    EMAIL_CODE_EXPIRED(400, "인증 코드가 만료되었습니다."),
+    EMAIL_CODE_INVALID(400, "인증 코드가 올바르지 않습니다."),
+    EMAIL_NOT_VERIFIED(403, "이메일 인증이 필요합니다."),
+
     // 유저
     USER_NOT_FOUND(404, "존재하지 않는 회원입니다."),
     EMAIL_DUPLICATED(409, "이미 사용 중인 이메일입니다."),
