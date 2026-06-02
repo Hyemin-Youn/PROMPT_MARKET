@@ -1,10 +1,10 @@
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE purchase;
 TRUNCATE TABLE prompt;
-TRUNCATE TABLE `user`;
+TRUNCATE TABLE users;
 SET FOREIGN_KEY_CHECKS = 1;
 
-INSERT IGNORE INTO `user` (email, password, nickname, role, status, created_at, updated_at)
+INSERT IGNORE INTO users (email, password, nickname, role, status, created_at, updated_at)
 VALUES
     ('seller1@test.com', 'password123', '프롬프트판매자', 'USER', 'ACTIVE', NOW(), NOW()),
     ('seller2@test.com', 'password123', 'AI전문가', 'USER', 'ACTIVE', NOW(), NOW());
