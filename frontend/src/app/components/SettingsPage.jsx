@@ -15,7 +15,7 @@ export const SettingsPage = ({ isPremium, onLogout, onUpgradePremium }) => {
     { key: "account",      label: "계정 정보", icon: User  },
     { key: "security",     label: "보안",      icon: Lock  },
     { key: "notification", label: "알림 설정", icon: Bell  },
-    { key: "subscription", label: "구독 관리", icon: Crown },
+    { key: "subscription", label: "결제 관리", icon: Crown },
   ];
 
   const inputStyle = (disabled = false) => ({
