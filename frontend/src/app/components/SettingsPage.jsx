@@ -171,7 +171,7 @@ export const SettingsPage = ({ isPremium, onLogout, onUpgradePremium }) => {
                     </div>
                     <div>
                       <h2 className="font-medium" style={{ color: "var(--foreground)" }}>{isPremium ? "회원 결제 이용중" : "무료 플랜"}</h2>
-                      <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{isPremium ? "다음 결제일 2025-06-20 · 월 29,000원" : "무료 샘플 및 가이드 열람 가능"}</p>
+                      <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{isPremium ? "다음 결제일 2025-06-20 : "무료 샘플 및 가이드 열람 가능"}</p>
                     </div>
                   </div>
                   <div className="space-y-2 mb-4">
