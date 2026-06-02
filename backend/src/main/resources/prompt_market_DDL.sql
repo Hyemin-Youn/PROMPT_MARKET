@@ -59,14 +59,16 @@ CREATE TABLE purchase (
     purchase_id  BIGINT    NOT NULL AUTO_INCREMENT,
     user_id      BIGINT    NOT NULL,
     prompt_id    BIGINT    NOT NULL,
-    paid_price        INT       NOT NULL,
+    paid_price   INT       NOT NULL,
+    status       ENUM('PENDING','COMPLETE','CANCEL') NOT NULL DEFAULT 'PENDING',
     purchased_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (purchase_id),
     FOREIGN KEY fk_purchase_user   (user_id)   REFERENCES user   (user_id)   ON DELETE RESTRICT,
     FOREIGN KEY fk_purchase_prompt (prompt_id) REFERENCES prompt (prompt_id) ON DELETE RESTRICT,
     UNIQUE KEY uq_purchase (user_id, prompt_id),
-    INDEX idx_purchase_purchased_at (purchased_at)
+    INDEX idx_purchase_purchased_at (purchased_at),
+    INDEX idx_purchase_status       (status)
 );
 
 -- =============================================
