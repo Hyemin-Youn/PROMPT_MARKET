@@ -9,16 +9,18 @@
    * ==================================================== */
 
   /* === 기본 배경 === */
-  --background: #0b0b12;
+
+  --background: #FFFFE0;
   --background-overlay: rgba(11, 11, 18, 0.85);
   --foreground: #ededf5;
 
+
   /* === 서피스 === */
-  --card: #13131e;
+  --card: #221e30;
   --card-foreground: #ededf5;
-  --sidebar: #0f0f1a;
+  --sidebar: #1e1a2c;
   --sidebar-foreground: #ededf5;
-  --muted: #1a1a28;
+  --muted: #2a2540;
   --muted-foreground: #6b6b8a;
   --secondary: #1e1a2e;
   --secondary-foreground: #c4b5fd;
