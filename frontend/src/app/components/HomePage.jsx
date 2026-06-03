@@ -24,11 +24,11 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
       {/* Hero */}
       <section className="relative px-4 pt-16 pb-12 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full opacity-20" style={{ background: "var(--gradient-hero)" }} />
+          <div className="absolute top-0 -left-10 w-[600px] h-[300px] rounded-full opacity-45" style={{ background: "var(--gradient-hero)" }} />
         </div>
         <div className="max-w-7xl mx-auto relative">
           <div className="max-w-2xl">
-            <h1 className="mb-3" style={{ fontSize: "2.25rem", fontWeight: 700, color: "var(--foreground)", lineHeight: 1.2 }}>
+            <h1 className="mb-3" style={{ fontSize: "2.25rem", fontWeight: 700, color: "#1e3a5f", lineHeight: 1.2 }}>
               개발자를 위한<br />
               <span style={{ color: "var(--brand-violet-light)" }}>AI 프롬프트 마켓</span>
             </h1>
@@ -37,8 +37,8 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
               GPT &amp; Claude Gemini 등 모든 AI 모델 지원
             </p>
             <div className="flex items-center gap-2 p-3 rounded-xl max-w-xl" style={{ background: "var(--card)", border: "1px solid var(--border-lg)" }}>
-              <Search size={16} style={{ color: "var(--muted-foreground)" }} />
-              <input className="flex-1 bg-transparent outline-none text-sm" style={{ color: "var(--foreground)" }} placeholder="예) API 설계, 코드 리뷰, Docker..." />
+              <Search size={16} style={{ color: "#ffffff" }} />
+              <input className="flex-1 bg-transparent outline-none text-sm" style={{ color: "#ffffff" }} placeholder="예) API 설계, 코드 리뷰, Docker..." />
               <button className="px-4 py-1.5 rounded-lg text-sm font-medium text-white" style={{ background: "var(--primary)" }}>검색</button>
             </div>
           </div>
@@ -56,7 +56,7 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
                   <span className="text-xs font-medium" style={{ color: "var(--brand-violet-light)" }}>이번 주 베스트</span>
                 </div>
                 <h2 className="mb-1" style={{ color: "var(--foreground)", fontWeight: 600 }}>실전에서 검증된 프롬프트</h2>
-                <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>현직 개발자들이 사용하는 고품질 AI 프롬프트 — 원하는 것만 골라서 구매하세요</p>
+                <p className="text-sm" style={{ color: "#ffffff" }}>현직 개발자들이 사용하는 고품질 AI 프롬프트 — 원하는 것만 골라서 구매하세요</p>
               </div>
               <button onClick={() => onSelectPrompt(1)} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--primary)" }}>
                 프롬프트 둘러보기 <ArrowRight size={14} />
@@ -72,7 +72,7 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
           <div className="flex items-center gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
             {CATEGORIES.map(cat => (
               <button key={cat} onClick={() => setActiveCategory(cat)} className="shrink-0 px-4 py-1.5 rounded-full text-sm transition-all"
-                style={activeCategory === cat ? { background: "var(--primary)", color: "#fff" } : { background: "var(--muted)", color: "var(--muted-foreground)", border: "1px solid var(--border-sm)" }}>
+                style={activeCategory === cat ? { background: "var(--primary)", color: "#fff" } : { background: "var(--muted)", color: "#ffffff", border: "1px solid var(--border-sm)" }}>
                 {cat}
               </button>
             ))}
@@ -84,7 +84,7 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
       <section className="px-4 pb-16">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold" style={{ color: "var(--foreground)" }}>인기 프롬프트</h2>
+            <h2 className="font-semibold" style={{ color: "#1e3a5f" }}>인기 프롬프트</h2>
             <span className="text-sm" style={{ color: "var(--muted-foreground)" }}>{filtered.length}개</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
