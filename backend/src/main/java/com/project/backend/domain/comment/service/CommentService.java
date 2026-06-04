@@ -23,13 +23,13 @@ public class CommentService {
 
 
     @Transactional
-    public CommentResponseDto createComment(Long promptId, Long userId, CommentRequestDto requestDto) {
+    public CommentResponseDto createComment(Long promptId, String email, CommentRequestDto requestDto) {
 
         Prompt prompt = promptRepository.findById(promptId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROMPT_NOT_FOUND));
 
 
-        PromptUser user = userRepository.findById(userId)
+        PromptUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Comment comment = Comment.builder()
@@ -45,12 +45,12 @@ public class CommentService {
 
 
     @Transactional
-    public CommentResponseDto updateComment(Long commentId, Long userId, CommentRequestDto requestDto) {
+    public CommentResponseDto updateComment(Long commentId, String email, CommentRequestDto requestDto) {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-        if (!comment.getUser().getId().equals(userId)) {
+        if (!comment.getUser().getId().equals(email)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
@@ -61,11 +61,11 @@ public class CommentService {
 
 
     @Transactional
-    public void deleteComment(Long commentId, Long userId) {
+    public void deleteComment(Long commentId, String email) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-        if (!comment.getUser().getId().equals(userId)) {
+        if (!comment.getUser().getId().equals(email)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 

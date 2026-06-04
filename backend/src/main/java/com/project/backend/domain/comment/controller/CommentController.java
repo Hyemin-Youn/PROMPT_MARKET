@@ -25,7 +25,8 @@ public class CommentController {
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody CommentRequestDto requestDto) {
 
-        CommentResponseDto responseDto = commentService.createComment(promptId, userDetails.getUserId(), requestDto);
+        CommentResponseDto responseDto =
+                commentService.createComment(promptId, userDetails.getUsername(), requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(responseDto));
@@ -38,7 +39,8 @@ public class CommentController {
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody CommentRequestDto requestDto) {
 
-        CommentResponseDto responseDto = commentService.updateComment(commentId, userDetails.getUserId(), requestDto);
+        CommentResponseDto responseDto =
+                commentService.updateComment(commentId, userDetails.getUsername(), requestDto);
 
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
@@ -49,7 +51,7 @@ public class CommentController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        commentService.deleteComment(commentId, userDetails.getUserId());
+        commentService.deleteComment(commentId, userDetails.getUsername());
 
         return ResponseEntity.ok(ApiResponse.success("댓글 삭제 완료"));
     }
