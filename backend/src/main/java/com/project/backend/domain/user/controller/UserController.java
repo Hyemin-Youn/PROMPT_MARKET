@@ -5,8 +5,11 @@ import com.project.backend.domain.user.dto.EmailVerifyRequestDto;
 import com.project.backend.domain.user.dto.UserRequestDto;
 import com.project.backend.domain.user.service.UserService;
 import com.project.backend.global.common.response.ApiResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,5 +46,23 @@ public class UserController {
 
         return ResponseEntity
                 .ok(ApiResponse.success("회원가입이 완료되었습니다."));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<Void>> login(
+            @Valid @RequestBody UserRequestDto.LoginRequestDto dto,
+            HttpServletResponse response
+    ) {
+        String token = userService.login(dto);
+
+        Cookie cookie = new Cookie("accessToken", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);       // 로컬 테스트는 false, 운영 시 true (HTTPS)
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60 * 24);
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.ok(ApiResponse.success("로그인 성공"));
     }
 }

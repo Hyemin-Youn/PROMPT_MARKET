@@ -4,6 +4,7 @@ import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.dto.EmailVerifyRequestDto;
 import com.project.backend.domain.user.dto.UserRequestDto;
 import com.project.backend.domain.user.repository.UserRepository;
+import com.project.backend.global.auth.JwtTokenProvider;
 import com.project.backend.global.exception.CustomException;
 import com.project.backend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class UserService {
     private final EmailVerificationService emailVerificationService;
 
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // 1단계: 코드 발송
     public void sendVerificationCode(UserRequestDto.SignUpRequestDto dto) {
@@ -59,5 +61,17 @@ public class UserService {
         );
 
         emailVerificationService.deleteVerified(dto.getEmail());
+    }
+
+    public String login(UserRequestDto.LoginRequestDto loginRequestDto) {
+
+        PromptUser user = userRepository.findByEmail(loginRequestDto.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
+
+        return jwtTokenProvider.generateToken(user.getEmail(), user.getRole().name());
     }
 }
