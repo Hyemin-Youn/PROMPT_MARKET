@@ -4,6 +4,10 @@ import com.project.backend.domain.comment.dto.CommentRequestDto;
 import com.project.backend.domain.comment.dto.CommentResponseDto;
 import com.project.backend.domain.comment.entity.Comment;
 import com.project.backend.domain.comment.repository.CommentRepository;
+import com.project.backend.domain.user.entity.PromptUser;
+import com.project.backend.domain.user.repository.UserRepository;
+import com.project.backend.global.exception.CustomException;
+import com.project.backend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,11 +26,11 @@ public class CommentService {
     public CommentResponseDto createComment(Long promptId, Long userId, CommentRequestDto requestDto) {
 
         Prompt prompt = promptRepository.findById(promptId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 프롬프트가 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.PROMPT_NOT_FOUND));
 
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+        PromptUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Comment comment = Comment.builder()
                 .content(requestDto.getContent())
@@ -36,7 +40,7 @@ public class CommentService {
 
         Comment savedComment = commentRepository.save(comment);
 
-        return new CommentResponseDto(savedComment);
+        return new CommentResponseDto.from(savedComment);
     }
 
 
@@ -44,25 +48,25 @@ public class CommentService {
     public CommentResponseDto updateComment(Long commentId, Long userId, CommentRequestDto requestDto) {
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
         if (!comment.getUser().getId().equals(userId)) {
-            throw new IllegalStateException("해당 댓글을 수정할 권한이 없습니다.");
+            throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
         comment.updateContent(requestDto.getContent());
 
-        return new CommentResponseDto(comment);
+        return new CommentResponseDto.from(comment);
     }
 
 
     @Transactional
     public void deleteComment(Long commentId, Long userId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
         if (!comment.getUser().getId().equals(userId)) {
-            throw new IllegalStateException("해당 댓글을 삭제할 권한이 없습니다.");
+            throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
         comment.deleteComment();

@@ -8,11 +8,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
@@ -20,10 +22,10 @@ public class CommentController {
     @PostMapping("/prompts/{promptId}/comments")
     public ResponseEntity<ApiResponse<CommentResponseDto>> createComment(
             @PathVariable Long promptId,
-            @RequestParam Long userId, // 임시 파라미터
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody CommentRequestDto requestDto) {
 
-        CommentResponseDto responseDto = commentService.createComment(promptId, userId, requestDto);
+        CommentResponseDto responseDto = commentService.createComment(promptId, userDetails.getUserId(), requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(responseDto));
@@ -33,10 +35,10 @@ public class CommentController {
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<ApiResponse<CommentResponseDto>> updateComment(
             @PathVariable Long commentId,
-            @RequestParam Long userId, // 임시 파라미터
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody CommentRequestDto requestDto) {
 
-        CommentResponseDto responseDto = commentService.updateComment(commentId, userId, requestDto);
+        CommentResponseDto responseDto = commentService.updateComment(commentId, userDetails.getUserId(), requestDto);
 
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
@@ -45,9 +47,9 @@ public class CommentController {
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<ApiResponse<Void>> deleteComment(
             @PathVariable Long commentId,
-            @RequestParam Long userId) { // 임시 파라미터
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        commentService.deleteComment(commentId, userId);
+        commentService.deleteComment(commentId, userDetails.getUserId());
 
         return ResponseEntity.ok(ApiResponse.success("댓글 삭제 완료"));
     }

@@ -2,6 +2,7 @@ package com.project.backend.domain.comment.dto;
 
 import com.project.backend.domain.comment.entity.Comment;
 import com.project.backend.domain.comment.entity.CommentStatus;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -19,15 +20,30 @@ public class CommentResponseDto {
     private LocalDateTime updatedAt;
 
 
-    public CommentResponseDto(Comment comment) {
-        this.commentId = comment.getId();
-        this.content = comment.getContent();
-        this.status = comment.getStatus();
-        this.userId = comment.getUser().getId();
-        this.nickname = comment.getUser().getNickname();
-        this.promptId = comment.getPrompt().getId();
-        this.createdAt = comment.getCreatedAt();
-        this.updatedAt = comment.getUpdatedAt();
+    @Builder
+    public CommentResponseDto(Long commentId, String content, CommentStatus status,
+                              Long userId, String nickname, Long promptId,
+                              LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.commentId = commentId;
+        this.content = content;
+        this.status = status;
+        this.userId = userId;
+        this.nickname = nickname;
+        this.promptId = promptId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
+    public static CommentResponseDto from(Comment comment) {
+        return CommentResponseDto.builder()
+                .commentId(comment.getId())
+                .content(comment.getContent())
+                .status(comment.getStatus())
+                .userId(comment.getUser().getId())
+                .nickname(comment.getUser().getNickname())
+                .promptId(comment.getPrompt().getId())
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
+                .build();
+    }
 }
