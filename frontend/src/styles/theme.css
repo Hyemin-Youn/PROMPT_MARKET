@@ -8,12 +8,16 @@
    * Dark Developer Theme | Kinetic Violet
    * ==================================================== */
 
-  /* === 기본 배경 === */
+  /* === 기본 배경 (따옴표 제거 및 문법 수정) === */
+  --background:
+          linear-gradient(to bottom, transparent 80%, #0b0b12 100%),
+          radial-gradient(circle at 10% -10%, rgba(124, 58, 237, 0.55) 0%, transparent 50%),
+          radial-gradient(circle at 90% -15%, rgba(167, 139, 250, 0.50) 0%, transparent 45%),
+          radial-gradient(circle at 50% 30%, rgba(124, 58, 237, 0.20) 0%, transparent 60%),
+          #0b0b12; /* 기본 배경색을 어두운 톤으로 통일 */
 
-  --background: #FFFFE0;
   --background-overlay: rgba(11, 11, 18, 0.85);
   --foreground: #ededf5;
-
 
   /* === 서피스 === */
   --card: #221e30;
@@ -113,44 +117,11 @@
   --radius: 0.5rem;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
-}
+/* * [선택] .dark 블록 제거 혹은 결을 맞춘 수정
+ * 기본 테마 자체가 훌륭한 Dark 아키텍처이므로 기존의 무채색 oklch 코드는 주석 처리하거나 제거하는 것이 좋습니다.
+ */
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
