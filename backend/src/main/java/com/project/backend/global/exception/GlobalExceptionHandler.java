@@ -2,12 +2,15 @@ package com.project.backend.global.exception;
 
 
 import com.project.backend.global.common.response.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.validation.BindException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -36,10 +39,24 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.fail(message));
     }
 
+    // @ModelAttribute 바인딩 실패 (잘못된 enum 값 등)
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBindException(BindException e) {
+
+        String message = e.getFieldErrors().stream()
+                .map(error -> error.getField() + "의 입력값이 올바르지 않습니다.")
+                .findFirst()
+                .orElse("요청 파라미터가 올바르지 않습니다.");
+
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.fail(message));
+    }
+
     // 나머지 예외
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
-
+        log.error("[500 ERROR] {} : {}", e.getClass().getSimpleName(), e.getMessage(), e);
         return ResponseEntity
                 .internalServerError()
                 .body(ApiResponse.fail(ErrorCode.INTERNAL_SERVER_ERROR.getMessage()));
