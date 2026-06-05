@@ -26,6 +26,11 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+### Custom ###
+*.zip
+DB/
+frontend/package-lock.json
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
