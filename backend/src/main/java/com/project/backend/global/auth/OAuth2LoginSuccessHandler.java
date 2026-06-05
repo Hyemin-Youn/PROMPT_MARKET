@@ -1,6 +1,6 @@
 package com.project.backend.global.auth;
 
-import com.project.backend.domain.user.Entity.PromptUser;
+import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.repository.UserRepository;
 import com.project.backend.global.exception.CustomException;
 import com.project.backend.global.exception.ErrorCode;
@@ -8,7 +8,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;

@@ -1,7 +1,7 @@
 package com.project.backend.domain.purchase.entity;
 
 import com.project.backend.domain.prompt.entity.Prompt;
-import com.project.backend.domain.user.Entity.PromptUser;
+import com.project.backend.domain.user.entity.PromptUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.project.backend.domain.prompt.entity;
 
-import com.project.backend.domain.user.Entity.PromptUser;
+import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
