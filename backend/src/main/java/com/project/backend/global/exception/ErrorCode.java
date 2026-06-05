@@ -38,7 +38,11 @@ public enum ErrorCode {
 
     // 별점
     ALREADY_RATED(409, "이미 별점을 등록했습니다."),
-    RATING_ONLY_FOR_BUYER(403, "구매자만 별점을 등록할 수 있습니다.");
+    RATING_ONLY_FOR_BUYER(403, "구매자만 별점을 등록할 수 있습니다."),
+
+    // 팔로우
+    INVALID_FOLLOW_REQUEST(400, "자기 자신을 팔로우할 수 없습니다");
+
 
     private final int status;
     private final String message;

@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -19,6 +21,17 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    // 댓글 목록 불러오기
+    @GetMapping("/prompts/{promptId}/comments")
+    public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getComments(
+            @PathVariable Long promptId) {
+
+        List<CommentResponseDto> responseDto = commentService.getComments(promptId);
+
+        return ResponseEntity.ok(ApiResponse.success(responseDto));
+    }
+
+    // 댓글 생성
     @PostMapping("/prompts/{promptId}/comments")
     public ResponseEntity<ApiResponse<CommentResponseDto>> createComment(
             @PathVariable Long promptId,
@@ -32,7 +45,7 @@ public class CommentController {
                 .body(ApiResponse.success(responseDto));
     }
 
-
+    // 댓글 수정
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<ApiResponse<CommentResponseDto>> updateComment(
             @PathVariable Long commentId,
@@ -46,6 +59,7 @@ public class CommentController {
     }
 
 
+    // 댓글 삭제
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<ApiResponse<Void>> deleteComment(
             @PathVariable Long commentId,

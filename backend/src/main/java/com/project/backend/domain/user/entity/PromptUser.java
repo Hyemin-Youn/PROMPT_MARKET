@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PromptUser extends BaseEntity {
