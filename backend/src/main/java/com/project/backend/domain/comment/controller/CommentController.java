@@ -26,9 +26,9 @@ public class CommentController {
     public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getComments(
             @PathVariable Long promptId) {
 
-        List<CommentResponseDto> responseDtos = commentService.getComments(promptId);
+        List<CommentResponseDto> responseDto = commentService.getComments(promptId);
 
-        return ResponseEntity.ok(ApiResponse.success(responseDtos));
+        return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
     // 댓글 생성

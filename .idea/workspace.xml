@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d5dccf3-b3d3-4130-8b66-d176e69e18f5" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/comment/controller/CommentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/comment/controller/CommentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/comment/repository/CommentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/comment/repository/CommentRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/comment/service/CommentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/comment/service/CommentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/follow/controller/FollowController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/follow/controller/FollowController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/follow/service/FollowService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/follow/service/FollowService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/like/dto/PromptLikeResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/like/dto/PromptLikeResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/like/service/PromptLikeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/like/service/PromptLikeService.java" afterDir="false" />
-    </list>
+    <list default="true" id="7d5dccf3-b3d3-4130-8b66-d176e69e18f5" name="변경" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
