@@ -1,10 +1,12 @@
 package com.project.backend.domain.user.service;
 
+import com.project.backend.domain.user.dto.TokenResponseDto;
 import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.dto.EmailVerifyRequestDto;
 import com.project.backend.domain.user.dto.UserRequestDto;
 import com.project.backend.domain.user.repository.UserRepository;
 import com.project.backend.global.auth.JwtTokenProvider;
+import com.project.backend.global.auth.RefreshTokenService;
 import com.project.backend.global.exception.CustomException;
 import com.project.backend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
     private final EmailVerificationService emailVerificationService;
+    private final RefreshTokenService refreshTokenService;
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -41,6 +44,7 @@ public class UserService {
         emailVerificationService.verifyCode(dto.getEmail(), dto.getCode());
     }
 
+    @Transactional
     public void signup(UserRequestDto.SignUpRequestDto dto) {
 
         if (!emailVerificationService.isVerified(dto.getEmail()))
@@ -63,15 +67,19 @@ public class UserService {
         emailVerificationService.deleteVerified(dto.getEmail());
     }
 
-    public String login(UserRequestDto.LoginRequestDto loginRequestDto) {
-
-        PromptUser user = userRepository.findByEmail(loginRequestDto.getEmail())
+    public TokenResponseDto login(UserRequestDto.LoginRequestDto dto) {
+        PromptUser user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
             throw new CustomException(ErrorCode.INVALID_INPUT);
-        }
 
-        return jwtTokenProvider.generateToken(user.getEmail(), user.getRole().name());
+        String accessToken = jwtTokenProvider.generateToken(user.getEmail(), user.getRole().name());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
+
+        // Redis에 저장
+        refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
+
+        return new TokenResponseDto(accessToken, refreshToken);
     }
 }
