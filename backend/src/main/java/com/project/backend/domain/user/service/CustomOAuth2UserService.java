@@ -30,17 +30,19 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         PromptUser user = saveOrUpdate(attributes);
 
+        // 깃허브는 "login", 구글은 "sub" 을 nameAttributeKey로 사용
+        String nameAttributeKey = registrationId.equals("google")
+                ? "sub"
+                : "login";
+
         return new DefaultOAuth2User(
                 List.of(new SimpleGrantedAuthority(user.getRole().name())),
                 oAuth2User.getAttributes(),
-                registrationId.equals("kakao")
-                        ? "id"
-                        : "sub"
+                nameAttributeKey
         );
     }
 
     private PromptUser saveOrUpdate(OAuthAttributes attributes) {
-
         return userRepository.findByEmail(attributes.getEmail())
                 .orElseGet(() -> userRepository.save(PromptUser.ofOAuth(
                         attributes.getEmail(),

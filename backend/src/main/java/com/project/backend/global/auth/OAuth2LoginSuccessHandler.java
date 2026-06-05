@@ -1,21 +1,22 @@
 package com.project.backend.global.auth;
 
-import com.project.backend.domain.user.Entity.PromptUser;
+import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.repository.UserRepository;
 import com.project.backend.global.exception.CustomException;
 import com.project.backend.global.exception.ErrorCode;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Map;
+import java.time.Duration;
+
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final RefreshTokenService refreshTokenService;  // 추가
 
     @Override
     public void onAuthenticationSuccess(
@@ -33,24 +35,36 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-        // 이메일 추출 (카카오/구글 공통)
         String email = extractEmail(oAuth2User);
 
         PromptUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        String token = jwtTokenProvider.generateToken(email, user.getRole().name());
+        String accessToken = jwtTokenProvider.generateToken(email, user.getRole().name());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(email);
 
-        // 쿠키 설정
-        Cookie cookie = new Cookie("accessToken", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);       // 로컬 테스트는 false, 운영 시 true (HTTPS)
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24);
+        // Redis에 저장
+        refreshTokenService.saveRefreshToken(email, refreshToken);
 
-        response.addCookie(cookie);
-        response.sendRedirect("/oauth2/callback");  // 토큰 쿼리 파라미터 제거
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofDays(1))
+                .sameSite("Lax")
+                .build();
 
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/api/auth/reissue")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        response.sendRedirect("/oauth2/callback");
     }
 
     private String extractEmail(OAuth2User user) {
@@ -59,8 +73,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             return user.getAttribute("email");
         }
 
-        // 카카오
-        Map<String, Object> kakaoAccount = user.getAttribute("kakao_account");
-        return (String) kakaoAccount.get("email");
+        // 깃허브
+        String login = user.getAttribute("login");
+        return "github_" + login + "@promptmart.com";
     }
 }
