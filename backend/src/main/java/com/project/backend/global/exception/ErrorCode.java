@@ -32,6 +32,9 @@ public enum ErrorCode {
     PROMPT_NOT_FOUND(404, "존재하지 않는 프롬프트입니다."),
     PROMPT_FORBIDDEN(403, "해당 프롬프트에 대한 권한이 없습니다."),
 
+    // 댓글
+    COMMENT_NOT_FOUND(404,"존재하지 않는 댓글입니다"),
+
     // 구매
     ALREADY_PURCHASED(409, "이미 구매한 프롬프트입니다."),
     NOT_PURCHASED(403, "구매 후 이용 가능합니다."),
@@ -41,7 +44,11 @@ public enum ErrorCode {
     RATING_ONLY_FOR_BUYER(403, "구매자만 별점을 등록할 수 있습니다."),
 
     // 팔로우
-    INVALID_FOLLOW_REQUEST(400, "자기 자신을 팔로우할 수 없습니다");
+    INVALID_FOLLOW_REQUEST(400, "자기 자신을 팔로우할 수 없습니다"),
+
+    // 신고
+    ALREADY_REPORTED(409, "이미 신고한 글입니다"),
+    SELF_REPORT_NOT_ALLOWED(400,"본인이 작성한 글은 신고할 수 없습니다");
 
 
     private final int status;

@@ -55,5 +55,4 @@ public class Comment extends BaseEntity {
     public void deleteComment() {
         this.status = CommentStatus.DELETED;
     }
-
 }
