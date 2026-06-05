@@ -16,13 +16,15 @@ public class JwtTokenProvider {
 
     private final SecretKey secretKey;
     private final long expiration;
+    private final long refreshExpiration;
 
     public JwtTokenProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long expiration
-    ) {
+            @Value("${jwt.expiration}") long expiration,
+            @Value("${jwt.refresh-expiration}") long refreshExpiration) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expiration = expiration;
+        this.refreshExpiration = refreshExpiration;
     }
 
     // 토큰 생성
@@ -36,9 +38,25 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    // RefreshToken 생성
+    public String generateRefreshToken(String email) {
+        return Jwts.builder()
+                .subject(email)
+                .claim("type", "refresh")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
+                .signWith(secretKey)
+                .compact();
+    }
+
     // 이메일 추출
     public String getEmail(String token) {
         return getClaims(token).getSubject();
+    }
+
+    // Access Token 여부 확인
+    public boolean isAccessToken(String token) {
+        return "access".equals(getClaims(token).get("type", String.class));
     }
 
     // 토큰 검증
@@ -49,6 +67,10 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public long getRefreshExpiration() {
+        return refreshExpiration;
     }
 
     private Claims getClaims(String token) {

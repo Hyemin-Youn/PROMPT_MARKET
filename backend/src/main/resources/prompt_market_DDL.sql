@@ -8,7 +8,7 @@ USE prompt_market;
 -- =============================================
 -- 1. user (회원)
 -- =============================================
-CREATE TABLE user (
+CREATE TABLE users (
     user_id    BIGINT          NOT NULL AUTO_INCREMENT,
     email      VARCHAR(100)    NOT NULL,
     password   VARCHAR(255)    NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE prompt (
     updated_at    DATETIME        ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (prompt_id),
-    FOREIGN KEY fk_prompt_user (user_id) REFERENCES user (user_id) ON DELETE RESTRICT,
+    FOREIGN KEY fk_prompt_user (user_id) REFERENCES users (user_id) ON DELETE RESTRICT,
     INDEX idx_prompt_category   (category),
     INDEX idx_prompt_ai_type    (ai_type),
     INDEX idx_prompt_status     (status),
@@ -59,14 +59,16 @@ CREATE TABLE purchase (
     purchase_id  BIGINT    NOT NULL AUTO_INCREMENT,
     user_id      BIGINT    NOT NULL,
     prompt_id    BIGINT    NOT NULL,
-    paid_price        INT       NOT NULL,
+    paid_price   INT       NOT NULL,
+    status       ENUM('PENDING','COMPLETE','CANCEL') NOT NULL DEFAULT 'PENDING',
     purchased_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (purchase_id),
     FOREIGN KEY fk_purchase_user   (user_id)   REFERENCES user   (user_id)   ON DELETE RESTRICT,
     FOREIGN KEY fk_purchase_prompt (prompt_id) REFERENCES prompt (prompt_id) ON DELETE RESTRICT,
     UNIQUE KEY uq_purchase (user_id, prompt_id),
-    INDEX idx_purchase_purchased_at (purchased_at)
+    INDEX idx_purchase_purchased_at (purchased_at),
+    INDEX idx_purchase_status       (status)
 );
 
 -- =============================================
@@ -120,7 +122,26 @@ CREATE TABLE likes (
 );
 
 -- =============================================
--- 7. follow (팔로우)
+-- 7. report (신고)
+-- =============================================
+CREATE TABLE report (
+    report_id   BIGINT       NOT NULL AUTO_INCREMENT, -- 신고 고유
+    reporter_id BIGINT       NOT NULL, -- 신고한 유저 ID (users 테이블)
+    target_type ENUM('PROMPT','COMMENT','USER') NOT NULL, -- 신고 대상 종
+    target_id   BIGINT       NOT NULL, -- 신고 대상의 ID
+    reason      ENUM('SPAM','ABUSE','COPYRIGHT','ETC') NOT NULL, -- 신고 사유
+    detail      VARCHAR(500) NULL, -- 상세 사유 (선택)
+    status      ENUM('PENDING','RESOLVED','REJECTED') NOT NULL DEFAULT 'PENDING', -- 처리 상태
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (report_id),
+    FOREIGN KEY fk_report_reporter (reporter_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    UNIQUE KEY uq_report (reporter_id, target_type, target_id), -- 중복 신고 방지
+    INDEX idx_report_status (status)
+);
+
+-- =============================================
+-- 8. follow (팔로우)
 -- =============================================
 CREATE TABLE follow (
     follow_id    BIGINT    NOT NULL AUTO_INCREMENT,
@@ -129,7 +150,7 @@ CREATE TABLE follow (
     created_at   DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (follow_id),
-    FOREIGN KEY fk_follow_follower  (follower_id)  REFERENCES user (user_id) ON DELETE CASCADE,
-    FOREIGN KEY fk_follow_following (following_id) REFERENCES user (user_id) ON DELETE CASCADE,
+    FOREIGN KEY fk_follow_follower  (follower_id)  REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY fk_follow_following (following_id) REFERENCES users (user_id) ON DELETE CASCADE,
     UNIQUE KEY uq_follow (follower_id, following_id)
 );

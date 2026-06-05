@@ -6,9 +6,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PromptUser extends BaseEntity {
@@ -21,6 +22,7 @@ public class PromptUser extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @JsonIgnore
     private String password;  // OAuth 유저는 null
 
     @Column(unique = true, nullable = false)

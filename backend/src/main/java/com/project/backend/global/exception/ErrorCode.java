@@ -14,6 +14,10 @@ public enum ErrorCode {
     NOT_FOUND(404, "리소스를 찾을 수 없습니다."),
     INTERNAL_SERVER_ERROR(500, "서버 내부 오류입니다."),
 
+    // 토큰
+    INVALID_REFRESH_TOKEN(401, "유효하지 않은 리프레시 토큰입니다."),
+    REFRESH_TOKEN_EXPIRED(401, "리프레시 토큰이 만료되었습니다."),
+
     // 이메일 인증
     EMAIL_CODE_EXPIRED(400, "인증 코드가 만료되었습니다."),
     EMAIL_CODE_INVALID(400, "인증 코드가 올바르지 않습니다."),
@@ -34,7 +38,11 @@ public enum ErrorCode {
 
     // 별점
     ALREADY_RATED(409, "이미 별점을 등록했습니다."),
-    RATING_ONLY_FOR_BUYER(403, "구매자만 별점을 등록할 수 있습니다.");
+    RATING_ONLY_FOR_BUYER(403, "구매자만 별점을 등록할 수 있습니다."),
+
+    // 팔로우
+    INVALID_FOLLOW_REQUEST(400, "자기 자신을 팔로우할 수 없습니다");
+
 
     private final int status;
     private final String message;

@@ -2,16 +2,26 @@ package com.project.backend.domain.user.controller;
 
 
 import com.project.backend.domain.user.dto.EmailVerifyRequestDto;
+import com.project.backend.domain.user.dto.TokenResponseDto;
 import com.project.backend.domain.user.dto.UserRequestDto;
 import com.project.backend.domain.user.service.UserService;
+import com.project.backend.global.auth.RefreshTokenService;
 import com.project.backend.global.common.response.ApiResponse;
+import com.project.backend.global.exception.CustomException;
+import com.project.backend.global.exception.ErrorCode;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/users")
@@ -19,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     // 1단계: 인증코드 발송
     @PostMapping("/send-code")
@@ -53,16 +64,93 @@ public class UserController {
             @Valid @RequestBody UserRequestDto.LoginRequestDto dto,
             HttpServletResponse response
     ) {
-        String token = userService.login(dto);
 
-        Cookie cookie = new Cookie("accessToken", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);       // 로컬 테스트는 false, 운영 시 true (HTTPS)
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24);
+        TokenResponseDto tokens = userService.login(dto);
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        // Access Token 쿠키
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", tokens.getAccessToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofDays(1))
+                .sameSite("Lax")
+                .build();
+
+        // Refresh Token 쿠키
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/api/auth/reissue")  // reissue 엔드포인트에서만 전송
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         return ResponseEntity.ok(ApiResponse.success("로그인 성공"));
+    }
+
+    // Access Token 재발급
+    @PostMapping("/reissue")
+    public ResponseEntity<ApiResponse<Void>> reissue(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+
+        String refreshToken = extractCookie(request, "refreshToken");
+
+        if (refreshToken == null) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        String newAccessToken = refreshTokenService.reissue(refreshToken);
+
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofDays(1))
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+
+        return ResponseEntity.ok(ApiResponse.success("토큰 재발급 성공"));
+    }
+
+    // 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+
+        refreshTokenService.deleteRefreshToken(userDetails.getUsername());
+
+        // 쿠키 만료
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", "")
+                .maxAge(0).path("/").build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
+                .maxAge(0).path("/api/auth/reissue").build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        return ResponseEntity.ok(ApiResponse.success("로그아웃 성공"));
+    }
+
+    private String extractCookie(HttpServletRequest request, String name) {
+        if (request.getCookies() == null) return null;
+
+        for (Cookie cookie : request.getCookies()) {
+            if (name.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+
+        return null;
     }
 }

@@ -4,15 +4,17 @@ import com.project.backend.domain.comment.dto.CommentRequestDto;
 import com.project.backend.domain.comment.dto.CommentResponseDto;
 import com.project.backend.domain.comment.entity.Comment;
 import com.project.backend.domain.comment.repository.CommentRepository;
+import com.project.backend.prompt.entity.Prompt;
+import com.project.backend.prompt.repository.PromptRepository;
 import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.repository.UserRepository;
 import com.project.backend.global.exception.CustomException;
 import com.project.backend.global.exception.ErrorCode;
-import com.project.backend.prompt.entity.Prompt;
-import com.project.backend.prompt.repository.PromptRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,22 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PromptRepository promptRepository;
+
+
+
+    public List<CommentResponseDto> getComments(Long promptId) {
+
+        Prompt prompt = promptRepository.findById(promptId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PROMPT_NOT_FOUND));
+
+
+        List<Comment> commentList = commentRepository.findAllByPromptPromptId(promptId);
+
+
+        return commentList.stream()
+                .map(CommentResponseDto::from)
+                .toList();
+    }
 
 
     @Transactional
@@ -42,7 +60,8 @@ public class CommentService {
 
         Comment savedComment = commentRepository.save(comment);
 
-        return  new CommentResponseDto.from(savedComment);
+        return CommentResponseDto.from(savedComment);
+
     }
 
 
@@ -52,13 +71,14 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-        if (!comment.getUser().getId().equals(email)) {
+        if (!comment.getUser().getEmail().equals(email)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
         comment.updateContent(requestDto.getContent());
 
-        return  new CommentResponseDto.from(comment);
+        return CommentResponseDto.from(comment);
+
     }
 
 
@@ -67,7 +87,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-        if (!comment.getUser().getId().equals(email)) {
+        if (!comment.getUser().getEmail().equals(email)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 

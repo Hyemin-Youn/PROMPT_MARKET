@@ -41,7 +41,7 @@ public class CommentResponseDto {
                 .status(comment.getStatus())
                 .userId(comment.getUser().getId())
                 .nickname(comment.getUser().getNickname())
-                .promptId(comment.getPrompt().getId())
+                .promptId(comment.getPrompt().getPromptId())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .build();

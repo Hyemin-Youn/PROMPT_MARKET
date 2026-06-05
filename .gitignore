@@ -1,5 +1,25 @@
+<<<<<<< HEAD
 /.idea
 ### Custom ###
 *.zip
 DB/
 frontend/package-lock.json
+=======
+# IDE
+.idea/
+*.iml
+
+# Gradle
+.gradle/
+build/
+out/
+
+# Secrets
+*.env
+application-secret.yml
+backend/src/main/resources/application.properties
+
+# OS
+.DS_Store
+Thumbs.db
+>>>>>>> develop
