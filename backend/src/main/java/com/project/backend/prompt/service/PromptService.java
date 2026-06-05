@@ -8,9 +8,11 @@ import com.project.backend.prompt.entity.Prompt;
 import com.project.backend.prompt.enums.PromptStatus;
 import com.project.backend.prompt.repository.PromptRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -103,7 +105,10 @@ public class PromptService {
     // 게시글 조회 공통 메서드
     private Prompt findPrompt(Long promptId) {
         return promptRepository.findById(promptId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "게시글을 찾을 수 없습니다."
+                ));
     }
 
     // 작성자 본인 여부 검증
@@ -113,21 +118,21 @@ public class PromptService {
         }
     }
 
-    // 상세 조회 가능한 게시글인지 검증
+    // 상세 조회 가능한 게시글인지 검증 _ 404 처리
     private void validateVisiblePrompt(Prompt prompt) {
         if (prompt.getStatus() == PromptStatus.DELETED) {
-            throw new IllegalArgumentException("삭제된 게시글입니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제된 게시글입니다.");
         }
 
         if (prompt.getStatus() == PromptStatus.HIDDEN) {
-            throw new IllegalArgumentException("숨김 처리된 게시글입니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "숨김 처리된 게시글입니다.");
         }
     }
 
     // 이미 삭제된 게시글인지 검증
     private void validateNotDeleted(Prompt prompt) {
         if (prompt.getStatus() == PromptStatus.DELETED) {
-            throw new IllegalArgumentException("이미 삭제된 게시글입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 삭제된 게시글입니다.");
         }
     }
 }

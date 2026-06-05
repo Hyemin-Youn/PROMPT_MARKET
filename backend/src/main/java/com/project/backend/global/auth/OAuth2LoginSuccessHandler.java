@@ -1,6 +1,6 @@
 package com.project.backend.global.auth;
 
-import com.project.backend.domain.user.Entity.PromptUser;
+import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.repository.UserRepository;
 import com.project.backend.global.exception.CustomException;
 import com.project.backend.global.exception.ErrorCode;

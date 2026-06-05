@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -68,10 +69,10 @@ public class UserService {
         PromptUser user = userRepository.findByEmail(loginRequestDto.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_INPUT);
         }
-
         return jwtTokenProvider.generateToken(user.getEmail(), user.getRole().name());
     }
 }

@@ -8,6 +8,8 @@ import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.repository.UserRepository;
 import com.project.backend.global.exception.CustomException;
 import com.project.backend.global.exception.ErrorCode;
+import com.project.backend.prompt.entity.Prompt;
+import com.project.backend.prompt.repository.PromptRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +42,7 @@ public class CommentService {
 
         Comment savedComment = commentRepository.save(comment);
 
-        return new CommentResponseDto.from(savedComment);
+        return  new CommentResponseDto.from(savedComment);
     }
 
 
@@ -56,7 +58,7 @@ public class CommentService {
 
         comment.updateContent(requestDto.getContent());
 
-        return new CommentResponseDto.from(comment);
+        return  new CommentResponseDto.from(comment);
     }
 
 

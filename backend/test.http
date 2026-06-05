@@ -1,10 +1,21 @@
-### 게시글 목록 조회
+### 로그인
+POST http://localhost:8080/api/users/login
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "1234"
+}
+
+
+
+
+### 1. 게시글 목록 조회
 GET http://localhost:8080/api/prompts
-Authorization: Basic user 2d66e57f-0648-4c1f-a374-a099947b56f8
 
 
-### 게시글 등록
-POST http://localhost:8080/api/prompts?userId=1
+### 2. 게시글 등록
+POST http://localhost:8080/api/prompts?userId=2
 Content-Type: application/json
 
 {
@@ -17,46 +28,29 @@ Content-Type: application/json
   "aiType": "GPT4"
 }
 
-
-### 게시글 목록 조회 - 등록 후 확인
-GET http://localhost:8080/api/prompts
-Authorization: Basic user e73c0609-5d73-4c62-8765-619485487eba
+### 3. 상세 조회
+GET http://localhost:8080/api/prompts/4
 
 
-### 게시글 상세 조회
-GET http://localhost:8080/api/prompts/1
-Authorization: Basic user e73c0609-5d73-4c62-8765-619485487eba
-
-
-### 게시글 수정
-PUT http://localhost:8080/api/prompts/1?userId=1
-Authorization: Basic user e73c0609-5d73-4c62-8765-619485487eba
+### 4. 수정
+PUT http://localhost:8080/api/prompts/4?userId=2
 Content-Type: application/json
 
 {
-  "title": "수정된 Spring Boot CRUD 프롬프트",
-  "content": "Spring Boot 3, JPA, MySQL 기반 CRUD 예제를 생성해줘.",
+  "title": "수정된 제목",
+  "content": "수정된 내용",
   "preview": "수정된 미리보기",
+  "thumbnailUrl": "https://example.com/updated.png",
+  "price": 2000,
   "category": "BACKEND",
-  "aiType": "GPT4",
-  "price": 1000
+  "aiType": "GPT4"
 }
 
-### 게시글 상세 조회 - 수정 후 확인
-GET http://localhost:8080/api/prompts/1
-Authorization: Basic user e73c0609-5d73-4c62-8765-619485487eba
+### 5. 수정 확인
+GET http://localhost:8080/api/prompts/4
 
+### 6. 삭제
+DELETE http://localhost:8080/api/prompts/4?userId=2
 
-### 게시글 숨김 처리
-PATCH http://localhost:8080/api/prompts/1/hide?userId=1
-Authorization: Basic user e73c0609-5d73-4c62-8765-619485487eba
-
-
-### 게시글 삭제
-DELETE http://localhost:8080/api/prompts/1?userId=1
-Authorization: Basic user e73c0609-5d73-4c62-8765-619485487eba
-
-
-### 게시글 목록 조회 - 삭제 후 확인
-GET http://localhost:8080/api/prompts
-Authorization: Basic user e73c0609-5d73-4c62-8765-619485487eba
+### 7. 삭제 후 조회 확인
+GET http://localhost:8080/api/prompts/4
