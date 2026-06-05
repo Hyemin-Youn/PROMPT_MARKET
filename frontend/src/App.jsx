@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
-import { Navbar } from "./components/Navbar.jsx";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
+import { Navbar } from "./components/layout/Navbar.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
-import { HomePage } from "./components/HomePage.jsx";
-import { PromptDetailPage } from "./components/PromptDetailPage.jsx";
-import { LibraryPage } from "./components/LibraryPage.jsx";
-import { AuthModal } from "./components/AuthModal.jsx";
+import { HomePage } from "./pages/HomePage.jsx";
+import { PromptDetailPage } from "./pages/PromptDetailPage.jsx";
+import { LibraryPage } from "./pages/LibraryPage.jsx";
+import { AuthModal } from "./components/auth/AuthModal.jsx";
 
 // 내부 컴포넌트에서 라우팅 훅(useNavigate 등)을 사용하기 위해 AppContent로 분리합니다.
 const AppContent = () => {
@@ -168,8 +168,6 @@ const AppContent = () => {
   );
 };
 
-// PromptDetailPage에서 URL의 id를 읽을 수 있도록 감싸주는 래퍼 컴포넌트
-import { useParams } from "react-router-dom";
 const PromptDetailPageWrapper = ({ onPurchase, isLoggedIn, purchasedPrompts }) => {
   const { id } = useParams();
   const navigate = useNavigate();
