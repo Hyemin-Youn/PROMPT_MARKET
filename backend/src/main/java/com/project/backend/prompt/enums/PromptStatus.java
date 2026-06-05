@@ -1,4 +1,4 @@
-package com.project.backend.enums;
+package com.project.backend.prompt.enums;
 
 public enum PromptStatus {
     ACTIVE,

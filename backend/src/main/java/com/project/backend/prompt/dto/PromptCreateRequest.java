@@ -1,14 +1,15 @@
-package com.project.backend.dto;
+package com.project.backend.prompt.dto;
 
-import com.project.backend.enums.AiType;
-import com.project.backend.enums.PromptCategory;
+
+import com.project.backend.prompt.enums.AiType;
+import com.project.backend.prompt.enums.PromptCategory;
+import lombok.Getter;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
 
 @Getter
-public class PromptUpdateRequest {
+public class PromptCreateRequest {
 
     @NotBlank(message = "제목은 필수입니다.")
     private String title;
@@ -18,6 +19,7 @@ public class PromptUpdateRequest {
 
     @NotBlank(message = "미리보기는 필수입니다.")
     private String preview;
+
 
     private String thumbnailUrl;
 
@@ -29,6 +31,4 @@ public class PromptUpdateRequest {
 
     @NotNull(message = "AI 종류는 필수입니다.")
     private AiType aiType;
-
-
 }

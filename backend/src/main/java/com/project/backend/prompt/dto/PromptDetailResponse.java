@@ -1,8 +1,9 @@
-package com.project.backend.dto;
+package com.project.backend.prompt.dto;
 
-import com.project.backend.entity.Prompt;
-import com.project.backend.enums.AiType;
-import com.project.backend.enums.PromptCategory;
+import com.project.backend.prompt.entity.Prompt;
+import com.project.backend.prompt.enums.AiType;
+import com.project.backend.prompt.enums.PromptCategory;
+import com.project.backend.prompt.enums.PromptStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,10 +11,12 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class PromptListResponse {
+public class PromptDetailResponse {
 
     private Long id;
+    private Long userId;
     private String title;
+    private String content;
     private String preview;
     private String thumbnailUrl;
     private int price;
@@ -21,13 +24,16 @@ public class PromptListResponse {
     private AiType aiType;
     private float rating;
     private int viewCount;
-    private Long userId;
+    private PromptStatus status;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public static PromptListResponse from(Prompt prompt) {
-        return PromptListResponse.builder()
+    public static PromptDetailResponse from(Prompt prompt) {
+        return PromptDetailResponse.builder()
                 .id(prompt.getId())
+                .userId(prompt.getUserId())
                 .title(prompt.getTitle())
+                .content(prompt.getContent())
                 .preview(prompt.getPreview())
                 .thumbnailUrl(prompt.getThumbnailUrl())
                 .price(prompt.getPrice())
@@ -35,8 +41,9 @@ public class PromptListResponse {
                 .aiType(prompt.getAiType())
                 .rating(prompt.getRating())
                 .viewCount(prompt.getViewCount())
-                .userId(prompt.getUserId())
+                .status(prompt.getStatus())
                 .createdAt(prompt.getCreatedAt())
+                .updatedAt(prompt.getUpdatedAt())
                 .build();
     }
 }

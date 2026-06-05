@@ -33,9 +33,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                       .requestMatchers("/api/users/**").permitAll()
+                       .anyRequest().authenticated()
+              )
+
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
                         .successHandler(oAuth2LoginSuccessHandler)

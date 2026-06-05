@@ -1,7 +1,7 @@
-package com.project.backend.repository;
+package com.project.backend.prompt.repository;
 
-import com.project.backend.entity.Prompt;
-import com.project.backend.enums.PromptStatus;
+import com.project.backend.prompt.entity.Prompt;
+import com.project.backend.prompt.enums.PromptStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

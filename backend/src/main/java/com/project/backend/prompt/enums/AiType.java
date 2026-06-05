@@ -1,7 +1,7 @@
-package com.project.backend.enums;
+package com.project.backend.prompt.enums;
 
 public enum AiType {
-    GTP4,
+    GPT4,
     CLAUDE,
     GEMINI,
     ETC

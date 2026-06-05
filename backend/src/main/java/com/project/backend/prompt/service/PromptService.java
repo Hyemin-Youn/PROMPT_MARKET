@@ -1,12 +1,12 @@
-package com.project.backend.service;
+package com.project.backend.prompt.service;
 
-import com.project.backend.dto.PromptCreateRequest;
-import com.project.backend.dto.PromptDetailResponse;
-import com.project.backend.dto.PromptListResponse;
-import com.project.backend.dto.PromptUpdateRequest;
-import com.project.backend.entity.Prompt;
-import com.project.backend.enums.PromptStatus;
-import com.project.backend.repository.PromptRepository;
+import com.project.backend.prompt.dto.PromptCreateRequest;
+import com.project.backend.prompt.dto.PromptDetailResponse;
+import com.project.backend.prompt.dto.PromptListResponse;
+import com.project.backend.prompt.dto.PromptUpdateRequest;
+import com.project.backend.prompt.entity.Prompt;
+import com.project.backend.prompt.enums.PromptStatus;
+import com.project.backend.prompt.repository.PromptRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;

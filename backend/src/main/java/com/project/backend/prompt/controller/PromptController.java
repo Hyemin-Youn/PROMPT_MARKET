@@ -1,10 +1,10 @@
-package com.project.backend.controller;
+package com.project.backend.prompt.controller;
 
-import com.project.backend.dto.PromptCreateRequest;
-import com.project.backend.dto.PromptDetailResponse;
-import com.project.backend.dto.PromptListResponse;
-import com.project.backend.dto.PromptUpdateRequest;
-import com.project.backend.service.PromptService;
+import com.project.backend.prompt.dto.PromptCreateRequest;
+import com.project.backend.prompt.dto.PromptDetailResponse;
+import com.project.backend.prompt.dto.PromptListResponse;
+import com.project.backend.prompt.dto.PromptUpdateRequest;
+import com.project.backend.prompt.service.PromptService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +22,7 @@ public class PromptController {
      * 게시글 등록
      * 임시로 userId를 RequestParam으로 받음
      */
+
     @PostMapping
     public Long createPrompt(
             @RequestParam Long userId,

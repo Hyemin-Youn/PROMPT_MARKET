@@ -1,9 +1,9 @@
-package com.project.backend.entity;
+package com.project.backend.prompt.entity;
 
 
-import com.project.backend.enums.AiType;
-import com.project.backend.enums.PromptCategory;
-import com.project.backend.enums.PromptStatus;
+import com.project.backend.prompt.enums.AiType;
+import com.project.backend.prompt.enums.PromptCategory;
+import com.project.backend.prompt.enums.PromptStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
