@@ -8,7 +8,7 @@ USE prompt_market;
 -- =============================================
 -- 1. user (회원)
 -- =============================================
-CREATE TABLE user (
+CREATE TABLE users (
     user_id    BIGINT          NOT NULL AUTO_INCREMENT,
     email      VARCHAR(100)    NOT NULL,
     password   VARCHAR(255)    NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE prompt (
     updated_at    DATETIME        ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (prompt_id),
-    FOREIGN KEY fk_prompt_user (user_id) REFERENCES user (user_id) ON DELETE RESTRICT,
+    FOREIGN KEY fk_prompt_user (user_id) REFERENCES users (user_id) ON DELETE RESTRICT,
     INDEX idx_prompt_category   (category),
     INDEX idx_prompt_ai_type    (ai_type),
     INDEX idx_prompt_status     (status),
@@ -59,14 +59,16 @@ CREATE TABLE purchase (
     purchase_id  BIGINT    NOT NULL AUTO_INCREMENT,
     user_id      BIGINT    NOT NULL,
     prompt_id    BIGINT    NOT NULL,
-    paid_price        INT       NOT NULL,
+    paid_price   INT       NOT NULL,
+    status       ENUM('PENDING','COMPLETE','CANCEL') NOT NULL DEFAULT 'PENDING',
     purchased_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (purchase_id),
     FOREIGN KEY fk_purchase_user   (user_id)   REFERENCES user   (user_id)   ON DELETE RESTRICT,
     FOREIGN KEY fk_purchase_prompt (prompt_id) REFERENCES prompt (prompt_id) ON DELETE RESTRICT,
     UNIQUE KEY uq_purchase (user_id, prompt_id),
-    INDEX idx_purchase_purchased_at (purchased_at)
+    INDEX idx_purchase_purchased_at (purchased_at),
+    INDEX idx_purchase_status       (status)
 );
 
 -- =============================================
@@ -129,7 +131,7 @@ CREATE TABLE follow (
     created_at   DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (follow_id),
-    FOREIGN KEY fk_follow_follower  (follower_id)  REFERENCES user (user_id) ON DELETE CASCADE,
-    FOREIGN KEY fk_follow_following (following_id) REFERENCES user (user_id) ON DELETE CASCADE,
+    FOREIGN KEY fk_follow_follower  (follower_id)  REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY fk_follow_following (following_id) REFERENCES users (user_id) ON DELETE CASCADE,
     UNIQUE KEY uq_follow (follower_id, following_id)
 );

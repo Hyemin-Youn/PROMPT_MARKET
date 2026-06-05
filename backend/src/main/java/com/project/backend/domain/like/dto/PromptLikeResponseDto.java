@@ -11,7 +11,7 @@ public class PromptLikeResponseDto {
     private final String authorNickname;
 
     public PromptLikeResponseDto(PromptLike promptLike) {
-        this.promptId = promptLike.getPrompt().getId();
+        this.promptId = promptLike.getPrompt().getPromptId();
         this.title = promptLike.getPrompt().getTitle();
         this.authorNickname = promptLike.getPrompt().getUser().getNickname();
     }

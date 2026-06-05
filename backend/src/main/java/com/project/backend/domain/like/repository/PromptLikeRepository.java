@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface PromptLikeRepository extends JpaRepository<PromptLike, Long> {
 
-    Optional<PromptLike> findByUserIdAndPromptId(Long userId, Long promptId);
+    Optional<PromptLike> findByUserIdAndPromptPromptId(Long userId, Long promptId);
 
     List<PromptLike> findByUserId(Long userId);
 
-    boolean existsByUserIdAndPromptId(Long userId, Long promptId);
+    boolean existsByUserIdAndPromptPromptId(Long userId, Long promptId);
 }

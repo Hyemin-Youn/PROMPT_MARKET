@@ -3,6 +3,8 @@ package com.project.backend.domain.like.service;
 import com.project.backend.domain.like.dto.PromptLikeResponseDto;
 import com.project.backend.domain.like.entity.PromptLike;
 import com.project.backend.domain.like.repository.PromptLikeRepository;
+import com.project.backend.domain.prompt.entity.Prompt;
+import com.project.backend.domain.prompt.repository.PromptRepository;
 import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.repository.UserRepository;
 import com.project.backend.global.exception.CustomException;
@@ -36,7 +38,7 @@ public class PromptLikeService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PROMPT_NOT_FOUND));
 
         Optional<PromptLike> promptLikeOptional =
-                promptLikeRepository.findByUserIdAndPromptId(user.getId(), promptId);
+                promptLikeRepository.findByUserIdAndPromptPromptId(user.getId(), promptId);
 
         if (promptLikeOptional.isPresent()) {
             promptLikeRepository.delete(promptLikeOptional.get());
