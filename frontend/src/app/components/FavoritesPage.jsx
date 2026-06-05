@@ -50,7 +50,7 @@ export const FavoritesPage = ({ onSelectPrompt }) => {
                   <Code2 size={24} style={{ color: "var(--brand-violet-light)", opacity: 0.4 }} />
                   {item.isPremium && (
                     <span className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs" style={{ background: "var(--gold-bg)", color: "var(--brand-gold)", border: "1px solid var(--gold-border-sm)" }}>
-                      <Crown size={9} /> 프리미엄
+                      <Crown size={9} /> 유료회원
                     </span>
                   )}
                   <button onClick={() => handleRemove(item.id)} className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-110"
