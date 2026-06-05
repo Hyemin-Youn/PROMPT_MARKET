@@ -1,6 +1,6 @@
 package com.project.backend.domain.user.repository;
 
-import com.project.backend.domain.user.Entity.PromptUser;
+import com.project.backend.domain.user.entity.PromptUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

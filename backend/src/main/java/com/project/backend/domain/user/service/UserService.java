@@ -1,6 +1,6 @@
 package com.project.backend.domain.user.service;
 
-import com.project.backend.domain.user.Entity.PromptUser;
+import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.dto.EmailVerifyRequestDto;
 import com.project.backend.domain.user.dto.UserRequestDto;
 import com.project.backend.domain.user.repository.UserRepository;
