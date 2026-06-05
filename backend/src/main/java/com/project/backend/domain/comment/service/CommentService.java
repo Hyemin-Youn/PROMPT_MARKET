@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -22,6 +24,22 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PromptRepository promptRepository;
+
+
+
+    public List<CommentResponseDto> getComments(Long promptId) {
+
+        Prompt prompt = promptRepository.findById(promptId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PROMPT_NOT_FOUND));
+
+
+        List<Comment> commentList = commentRepository.findAllByPromptPromptId(promptId);
+
+
+        return commentList.stream()
+                .map(CommentResponseDto::from)
+                .toList();
+    }
 
 
     @Transactional
@@ -52,7 +70,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-        if (!comment.getUser().getId().equals(email)) {
+        if (!comment.getUser().getEmail().equals(email)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
@@ -67,7 +85,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
-        if (!comment.getUser().getId().equals(email)) {
+        if (!comment.getUser().getEmail().equals(email)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
