@@ -13,6 +13,6 @@ public class PromptLikeResponseDto {
     public PromptLikeResponseDto(PromptLike promptLike) {
         this.promptId = promptLike.getPrompt().getId();
         this.title = promptLike.getPrompt().getTitle();
-        this.authorNickname = promptLike.getPrompt().getNickname();
+        this.authorNickname = promptLike.getPrompt().getUser().getNickname();
     }
 }

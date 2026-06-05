@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -34,19 +35,20 @@ public class PromptLikeService {
         Prompt prompt = promptRepository.findById(promptId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROMPT_NOT_FOUND));
 
-        return promptLikeRepository.findByUserIdAndPromptId(user.getId(), promptId)
-                .map(like -> {
-                    promptLikeRepository.delete(like);
-                    return false;
-                })
-                .orElseGet(() -> {
-                    PromptLike newLike = PromptLike.builder()
-                            .user(user)
-                            .prompt(prompt)
-                            .build();
-                    promptLikeRepository.save(newLike);
-                    return true;
-                });
+        Optional<PromptLike> promptLikeOptional =
+                promptLikeRepository.findByUserIdAndPromptId(user.getId(), promptId);
+
+        if (promptLikeOptional.isPresent()) {
+            promptLikeRepository.delete(promptLikeOptional.get());
+            return false;
+        } else {
+            PromptLike newLike = PromptLike.builder()
+                    .user(user)
+                    .prompt(prompt)
+                    .build();
+            promptLikeRepository.save(newLike);
+            return true;
+        }
     }
 
 
@@ -60,6 +62,6 @@ public class PromptLikeService {
 
         return likeList.stream()
                 .map(PromptLikeResponseDto::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

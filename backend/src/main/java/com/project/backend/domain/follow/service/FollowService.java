@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,19 +40,21 @@ public class FollowService {
         }
 
 
-        return followRepository.findByFollowerIdAndFollowingId(follower.getId(), following.getId())
-                .map(follow -> {
-                    followRepository.delete(follow);
-                    return false;
-                })
-                .orElseGet(() -> {
-                    Follow newFollow = Follow.builder()
-                            .follower(follower)
-                            .following(following)
-                            .build();
-                    followRepository.save(newFollow);
-                    return true;
-                });
+        Optional<Follow> followOptional =
+                followRepository.findByFollowerIdAndFollowingId(follower.getId(), following.getId());
+
+        // 팔로우를 하고 있다면 취소, 아니면 팔로우
+        if (followOptional.isPresent()) {
+            followRepository.delete(followOptional.get());
+            return false;
+        } else {
+            Follow newFollow = Follow.builder()
+                    .follower(follower)
+                    .following(following)
+                    .build();
+            followRepository.save(newFollow);
+            return true;
+        }
     }
 
 
@@ -66,7 +69,7 @@ public class FollowService {
 
         return followings.stream()
                 .map(follow -> new FollowResponseDto(follow.getFollowing()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
@@ -80,6 +83,6 @@ public class FollowService {
 
         return followers.stream()
                 .map(follow -> new FollowResponseDto(follow.getFollower()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

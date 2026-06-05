@@ -19,9 +19,9 @@ public class FollowController {
     private final FollowService followService;
 
     // 팔로우 등록 및 취소
-    @PostMapping("/{userId}/follow")
+    @PostMapping("/{followingId}/follow")
     public ResponseEntity<ApiResponse<String>> toggleFollow(
-            @PathVariable("userId") Long followingId,
+            @PathVariable Long followingId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         String email = userDetails.getUsername();
