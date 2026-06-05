@@ -1,0 +1,5 @@
+/.idea
+### Custom ###
+*.zip
+DB/
+frontend/package-lock.json
