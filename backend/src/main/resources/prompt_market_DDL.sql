@@ -122,7 +122,26 @@ CREATE TABLE likes (
 );
 
 -- =============================================
--- 7. follow (팔로우)
+-- 7. report (신고)
+-- =============================================
+CREATE TABLE report (
+    report_id   BIGINT       NOT NULL AUTO_INCREMENT, -- 신고 고유
+    reporter_id BIGINT       NOT NULL, -- 신고한 유저 ID (users 테이블)
+    target_type ENUM('PROMPT','COMMENT','USER') NOT NULL, -- 신고 대상 종
+    target_id   BIGINT       NOT NULL, -- 신고 대상의 ID
+    reason      ENUM('SPAM','ABUSE','COPYRIGHT','ETC') NOT NULL, -- 신고 사유
+    detail      VARCHAR(500) NULL, -- 상세 사유 (선택)
+    status      ENUM('PENDING','RESOLVED','REJECTED') NOT NULL DEFAULT 'PENDING', -- 처리 상태
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (report_id),
+    FOREIGN KEY fk_report_reporter (reporter_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    UNIQUE KEY uq_report (reporter_id, target_type, target_id), -- 중복 신고 방지
+    INDEX idx_report_status (status)
+);
+
+-- =============================================
+-- 8. follow (팔로우)
 -- =============================================
 CREATE TABLE follow (
     follow_id    BIGINT    NOT NULL AUTO_INCREMENT,
