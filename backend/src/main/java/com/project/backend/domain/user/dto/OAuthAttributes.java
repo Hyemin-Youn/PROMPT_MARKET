@@ -17,8 +17,8 @@ public class OAuthAttributes {
             Map<String, Object> attributes
     ) {
 
-        if ("kakao".equals(registrationId)) {
-            return ofKakao(attributes);
+        if ("github".equals(registrationId)) {
+            return ofGithub(attributes);
         }
 
         return ofGoogle(attributes);
@@ -32,14 +32,17 @@ public class OAuthAttributes {
                 .build();
     }
 
-    @SuppressWarnings("unchecked")
-    private static OAuthAttributes ofKakao(Map<String, Object> attributes) {
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+    private static OAuthAttributes ofGithub(Map<String, Object> attributes) {
+        // 깃허브는 email이 null일 수 있음c
+        String email = (String) attributes.get("email");
+
+        if (email == null) {
+            email = "github_" + attributes.get("login") + "@promptmart.com";
+        }
 
         return OAuthAttributes.builder()
-                .email((String) kakaoAccount.get("email"))
-                .nickname((String) profile.get("nickname"))
+                .email(email)
+                .nickname((String) attributes.get("login"))
                 .build();
     }
 }
