@@ -44,4 +44,12 @@ public class Purchase {
             this.status = PurchaseStatus.PENDING;
         }
     }
+
+    public Purchase(PromptUser user, Prompt prompt, int paidPrice) {
+        this.user = user;
+        this.prompt = prompt;
+        this.paidPrice = paidPrice;
+        this.status = PurchaseStatus.PENDING;
+        this.purchasedAt = LocalDateTime.now();
+    }
 }
