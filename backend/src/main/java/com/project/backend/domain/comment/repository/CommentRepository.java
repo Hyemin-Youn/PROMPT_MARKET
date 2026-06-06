@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findAllByPromptIdAndStatus(Long promptId, CommentStatus status);
+    List<Comment> findAllByPromptPromptIdAndStatus(Long promptId, CommentStatus status);
 }
