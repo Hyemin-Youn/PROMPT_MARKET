@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "purchase")
+@Table(name = "purchase", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "prompt_id"})
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Purchase {
@@ -40,16 +42,12 @@ public class Purchase {
     @PrePersist
     private void prePersist() {
         this.purchasedAt = LocalDateTime.now();
-        if (this.status == null) {
-            this.status = PurchaseStatus.PENDING;
-        }
+        this.status = PurchaseStatus.COMPLETE;
     }
 
     public Purchase(PromptUser user, Prompt prompt, int paidPrice) {
         this.user = user;
         this.prompt = prompt;
         this.paidPrice = paidPrice;
-        this.status = PurchaseStatus.PENDING;
-        this.purchasedAt = LocalDateTime.now();
     }
 }
