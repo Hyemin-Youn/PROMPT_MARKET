@@ -1,10 +1,14 @@
 package com.project.backend.domain.report.service;
 
+import com.project.backend.domain.comment.entity.Comment;
 import com.project.backend.domain.comment.repository.CommentRepository;
+import com.project.backend.domain.prompt.entity.PromptStatus;
 import com.project.backend.domain.prompt.repository.PromptRepository;
+import com.project.backend.domain.report.dto.ReportProcessRequestDto;
 import com.project.backend.domain.report.dto.ReportRequestDto;
 import com.project.backend.domain.report.dto.ReportResponseDto;
 import com.project.backend.domain.report.entity.Report;
+import com.project.backend.domain.report.entity.ReportStatus;
 import com.project.backend.domain.report.entity.ReportTargetType;
 import com.project.backend.domain.report.repository.ReportRepository;
 import com.project.backend.domain.user.entity.PromptUser;
@@ -14,6 +18,8 @@ import com.project.backend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +67,7 @@ public class ReportService {
     }
 
 
-    // 신고 대상 검증 : switch~case를 활용하여 prompt/comment/user 신고 구분
+    // 신고 대상 검증 메서드: switch~case를 활용하여 prompt/comment/user 신고 구분
     private void validateTargetExists(ReportTargetType targetType, Long targetId) {
         switch (targetType) {
             case PROMPT -> promptRepository.findById(targetId)
@@ -74,7 +80,7 @@ public class ReportService {
     }
 
 
-    // 본인 신고 검증
+    // 본인 신고 검증 메서드
     private void validateSelfReport(Long reporterId, ReportTargetType targetType, Long targetId) {
         Long ownerId = switch (targetType) {
             case PROMPT -> promptRepository.findById(targetId)
@@ -88,6 +94,56 @@ public class ReportService {
 
         if (reporterId.equals(ownerId)) {
             throw new CustomException(ErrorCode.SELF_REPORT_NOT_ALLOWED);
+        }
+    }
+
+
+
+    /**
+     *  관리자용 메서드
+     */
+
+    // 전체 신고 목록 조회(관리자용)
+    public List<ReportResponseDto> getAllReports() {
+        return reportRepository.findAll().stream()
+                .map(ReportResponseDto::from)
+                .toList();
+    }
+
+
+    // 신고건 처리(관리자용)
+    @Transactional
+    public ReportResponseDto processReport(Long reportId, ReportProcessRequestDto requestDto) {
+
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
+        if (report.getStatus() != ReportStatus.PENDING) {
+            throw new CustomException(ErrorCode.REPORT_ALREADY_PROCESSED);
+        }
+
+        report.updateReportStatus(requestDto.getStatus());
+
+
+        if (requestDto.getStatus() == ReportStatus.RESOLVED) {
+            completeProcessedReport(report.getReportTargetType(), report.getTargetId());
+        }
+
+        return ReportResponseDto.from(report);
+    }
+
+    // 처리가 완료된 신고건을 처리하는 메서드(Prompt:HIDDEN/Comment:DELETED/User:SUSPENDED)
+    private void completeProcessedReport(ReportTargetType targetType, Long targetId) {
+        switch (targetType) {
+            case PROMPT -> promptRepository.findById(targetId).ifPresent(prompt -> {
+                prompt.hide();
+            });
+
+            case COMMENT -> commentRepository.findById(targetId).ifPresent(Comment::deleteComment);
+
+            case USER -> userRepository.findById(targetId).ifPresent(user -> {
+                user.updateStatus(PromptUser.Status.SUSPENDED);
+            });
         }
     }
 }
