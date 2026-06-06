@@ -1,9 +1,9 @@
-package com.project.backend.prompt.dto;
+package com.project.backend.domain.prompt.dto;
 
-import com.project.backend.prompt.entity.Prompt;
-import com.project.backend.prompt.enums.AiType;
-import com.project.backend.prompt.enums.PromptCategory;
-import com.project.backend.prompt.enums.PromptStatus;
+import com.project.backend.domain.prompt.entity.AiType;
+import com.project.backend.domain.prompt.entity.Prompt;
+import com.project.backend.domain.prompt.entity.PromptCategory;
+import com.project.backend.domain.prompt.entity.PromptStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -30,8 +30,8 @@ public class PromptDetailResponse {
 
     public static PromptDetailResponse from(Prompt prompt) {
         return PromptDetailResponse.builder()
-                .id(prompt.getId())
-                .userId(prompt.getUserId())
+                .id(prompt.getPromptId())
+                .userId(prompt.getUser().getId())
                 .title(prompt.getTitle())
                 .content(prompt.getContent())
                 .preview(prompt.getPreview())
