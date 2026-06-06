@@ -53,4 +53,10 @@ public class Prompt extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PromptStatus status;
+
+
+    // 신고당한 프롬프트 상태 변경 (관리자용)
+    public void updateStatus(PromptStatus status) {
+        this.status = status;
+    }
 }

@@ -48,7 +48,8 @@ public enum ErrorCode {
 
     // 신고
     ALREADY_REPORTED(409, "이미 신고한 글입니다"),
-    SELF_REPORT_NOT_ALLOWED(400,"본인이 작성한 글은 신고할 수 없습니다");
+    SELF_REPORT_NOT_ALLOWED(400,"본인이 작성한 글은 신고할 수 없습니다"),
+    REPORT_ALREADY_PROCESSED(400, "이미 처리된 신고건입니다");
 
 
     private final int status;
