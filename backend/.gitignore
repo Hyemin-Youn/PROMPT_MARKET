@@ -18,14 +18,15 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-.idea/
-.idea/workspace.xml
+.idea
 *.iws
 *.iml
 *.ipr
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+
+
 
 ### NetBeans ###
 /nbproject/private/

@@ -32,10 +32,14 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+
+
+               .authorizeHttpRequests(auth -> auth
+                      .requestMatchers("/api/users/**").permitAll()
+                       .requestMatchers("/api/prompts/**").permitAll() // 추가
+                      .anyRequest().authenticated()
+             )
+
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
                         .successHandler(oAuth2LoginSuccessHandler)

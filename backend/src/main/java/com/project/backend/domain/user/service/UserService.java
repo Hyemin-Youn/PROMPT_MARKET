@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -71,6 +72,7 @@ public class UserService {
         PromptUser user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
             throw new CustomException(ErrorCode.INVALID_INPUT);
 
@@ -81,5 +83,6 @@ public class UserService {
         refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
 
         return new TokenResponseDto(accessToken, refreshToken);
+
     }
 }

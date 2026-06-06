@@ -7,18 +7,19 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.46/a5cfe99fdf320e84955ef653f2ce1bf789d11385/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="backend_main" />
-        <module name="backend_test" />
+        <module name="backend.main" />
+        <module name="backend.test" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="21">
+    <bytecodeTargetLevel>
+      <module name="backend" target="21" />
       <module name="backend.main" target="21" />
       <module name="backend.test" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_STRING" value="-parameters" />
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="backend" options="-parameters" />
       <module name="backend.main" options="-parameters" />
       <module name="backend.test" options="-parameters" />
     </option>

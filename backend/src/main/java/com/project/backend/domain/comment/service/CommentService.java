@@ -5,8 +5,8 @@ import com.project.backend.domain.comment.dto.CommentResponseDto;
 import com.project.backend.domain.comment.entity.Comment;
 import com.project.backend.domain.comment.entity.CommentStatus;
 import com.project.backend.domain.comment.repository.CommentRepository;
-import com.project.backend.domain.prompt.entity.Prompt;
-import com.project.backend.domain.prompt.repository.PromptRepository;
+import com.project.backend.prompt.entity.Prompt;
+import com.project.backend.prompt.repository.PromptRepository;
 import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.repository.UserRepository;
 import com.project.backend.global.exception.CustomException;
@@ -61,6 +61,7 @@ public class CommentService {
         Comment savedComment = commentRepository.save(comment);
 
         return CommentResponseDto.from(savedComment);
+
     }
 
 
@@ -77,6 +78,7 @@ public class CommentService {
         comment.updateContent(requestDto.getContent());
 
         return CommentResponseDto.from(comment);
+
     }
 
 

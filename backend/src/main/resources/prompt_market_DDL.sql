@@ -64,7 +64,7 @@ CREATE TABLE purchase (
     purchased_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (purchase_id),
-    FOREIGN KEY fk_purchase_user   (user_id)   REFERENCES user   (user_id)   ON DELETE RESTRICT,
+    FOREIGN KEY fk_purchase_user   (user_id)   REFERENCES users  (user_id)   ON DELETE RESTRICT,
     FOREIGN KEY fk_purchase_prompt (prompt_id) REFERENCES prompt (prompt_id) ON DELETE RESTRICT,
     UNIQUE KEY uq_purchase (user_id, prompt_id),
     INDEX idx_purchase_purchased_at (purchased_at),
@@ -82,7 +82,7 @@ CREATE TABLE rating (
     created_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (rating_id),
-    FOREIGN KEY fk_rating_user   (user_id)   REFERENCES user   (user_id)   ON DELETE RESTRICT,
+    FOREIGN KEY fk_rating_user   (user_id)   REFERENCES users  (user_id)   ON DELETE RESTRICT,
     FOREIGN KEY fk_rating_prompt (prompt_id) REFERENCES prompt (prompt_id) ON DELETE CASCADE,
     UNIQUE KEY uq_rating (user_id, prompt_id),
     CONSTRAINT chk_rating_score CHECK (score BETWEEN 1 AND 5)
@@ -102,7 +102,7 @@ CREATE TABLE comment (
 
     PRIMARY KEY (comment_id),
     FOREIGN KEY fk_comment_prompt (prompt_id) REFERENCES prompt (prompt_id) ON DELETE CASCADE,
-    FOREIGN KEY fk_comment_user   (user_id)   REFERENCES user   (user_id)   ON DELETE RESTRICT,
+    FOREIGN KEY fk_comment_user   (user_id)   REFERENCES users  (user_id)   ON DELETE RESTRICT,
     INDEX idx_comment_status (status)
 );
 
@@ -116,7 +116,7 @@ CREATE TABLE likes (
     created_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (likes_id),
-    FOREIGN KEY fk_likes_user   (user_id)   REFERENCES user   (user_id)   ON DELETE CASCADE,
+    FOREIGN KEY fk_likes_user   (user_id)   REFERENCES users  (user_id)   ON DELETE CASCADE,
     FOREIGN KEY fk_likes_prompt (prompt_id) REFERENCES prompt (prompt_id) ON DELETE CASCADE,
     UNIQUE KEY uq_likes (user_id, prompt_id)
 );

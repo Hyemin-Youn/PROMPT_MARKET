@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+/.idea
+### Custom ###
+*.zip
+DB/
+frontend/package-lock.json
+=======
 # IDE
 .idea/
 *.iml
@@ -15,3 +22,4 @@ backend/src/main/resources/application.properties
 # OS
 .DS_Store
 Thumbs.db
+>>>>>>> develop

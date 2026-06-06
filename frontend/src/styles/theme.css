@@ -1,0 +1,184 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+
+  /* ====================================================
+   * 1조원 — AI 프롬프트 마켓 디자인 시스템
+   * Dark Developer Theme | Kinetic Violet
+   * ==================================================== */
+
+  /* === 기본 배경 (따옴표 제거 및 문법 수정) === */
+  --background:
+          linear-gradient(to bottom, transparent 80%, #0b0b12 100%),
+          radial-gradient(circle at 10% -10%, rgba(124, 58, 237, 0.55) 0%, transparent 50%),
+          radial-gradient(circle at 90% -15%, rgba(167, 139, 250, 0.50) 0%, transparent 45%),
+          radial-gradient(circle at 50% 30%, rgba(124, 58, 237, 0.20) 0%, transparent 60%),
+          #0b0b12; /* 기본 배경색을 어두운 톤으로 통일 */
+
+  --background-overlay: rgba(11, 11, 18, 0.85);
+  --foreground: #ededf5;
+
+  /* === 서피스 === */
+  --card: #221e30;
+  --card-foreground: #ededf5;
+  --sidebar: #1e1a2c;
+  --sidebar-foreground: #ededf5;
+  --muted: #2a2540;
+  --muted-foreground: #6b6b8a;
+  --secondary: #1e1a2e;
+  --secondary-foreground: #c4b5fd;
+  --popover: #13131e;
+  --popover-foreground: #ededf5;
+
+  /* === Primary: electric violet === */
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --brand-violet: #7c3aed;
+  --brand-violet-light: #a78bfa;
+
+  /* === Primary 배경 (투명도별) === */
+  --primary-bg-xs:  rgba(124, 58, 237, 0.08);
+  --primary-bg-sm:  rgba(124, 58, 237, 0.10);
+  --primary-bg:     rgba(124, 58, 237, 0.12);
+  --primary-bg-md:  rgba(124, 58, 237, 0.15);
+  --primary-bg-lg:  rgba(124, 58, 237, 0.20);
+  --primary-glow:   rgba(124, 58, 237, 0.25);
+
+  /* === Primary 보더 (투명도별) === */
+  --border-xs:  rgba(124, 58, 237, 0.08);
+  --border-sm:  rgba(124, 58, 237, 0.10);
+  --border:     rgba(124, 58, 237, 0.18);
+  --border-md:  rgba(124, 58, 237, 0.20);
+  --border-lg:  rgba(124, 58, 237, 0.25);
+  --border-xl:  rgba(124, 58, 237, 0.30);
+  --border-2xl: rgba(124, 58, 237, 0.40);
+
+  /* === Accent: cyan === */
+  --accent: #06b6d4;
+  --accent-foreground: #0b0b12;
+  --brand-cyan: #06b6d4;
+  --brand-cyan-light: #67e8f9;
+  --accent-bg-subtle: rgba(6, 182, 212, 0.10);
+  --accent-border: rgba(6, 182, 212, 0.20);
+
+  /* === Gold: 프리미엄 === */
+  --brand-gold: #f59e0b;
+  --brand-gold-foreground: #0b0b12;
+  --gold-bg-subtle: rgba(245, 158, 11, 0.10);
+  --gold-bg:        rgba(245, 158, 11, 0.15);
+  --gold-bg-md:     rgba(245, 158, 11, 0.20);
+  --gold-border-sm: rgba(245, 158, 11, 0.20);
+  --gold-border:    rgba(245, 158, 11, 0.25);
+  --gold-border-md: rgba(245, 158, 11, 0.30);
+
+  /* === Destructive: red === */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --destructive-bg-subtle: rgba(239, 68, 68, 0.15);
+  --destructive-bg: rgba(239, 68, 68, 0.20);
+  --destructive-border-sm: rgba(239, 68, 68, 0.20);
+  --destructive-border: rgba(239, 68, 68, 0.30);
+
+  /* === Success: green === */
+  --success: #10b981;
+  --success-bg-subtle: rgba(16, 185, 129, 0.15);
+  --success-border: rgba(16, 185, 129, 0.30);
+
+  /* === 그라디언트 === */
+  --gradient-primary: linear-gradient(135deg, #7c3aed, #06b6d4);
+  --gradient-card:    linear-gradient(135deg, #1e1a2e, #13131e);
+  --gradient-hero:    radial-gradient(ellipse, #7c3aed, transparent 70%);
+  --gradient-profile: linear-gradient(135deg, #7c3aed, #06b6d4);
+
+  /* === 기타 === */
+  --input: transparent;
+  --input-background: #1a1a28;
+  --switch-background: #2d2d45;
+  --ring: rgba(124, 58, 237, 0.50);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+
+  /* === 사이드바 === */
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e1a2e;
+  --sidebar-accent-foreground: #c4b5fd;
+  --sidebar-border: rgba(124, 58, 237, 0.15);
+  --sidebar-ring: rgba(124, 58, 237, 0.50);
+
+  /* === 차트 === */
+  --chart-1: #7c3aed;
+  --chart-2: #06b6d4;
+  --chart-3: #f59e0b;
+  --chart-4: #10b981;
+  --chart-5: #ef4444;
+
+  --radius: 0.5rem;
+}
+
+/* * [선택] .dark 블록 제거 혹은 결을 맞춘 수정
+ * 기본 테마 자체가 훌륭한 Dark 아키텍처이므로 기존의 무채색 oklch 코드는 주석 처리하거나 제거하는 것이 좋습니다.
+ */
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  html { font-size: var(--font-size); }
+
+  h1 { font-size: var(--text-2xl); font-weight: var(--font-weight-medium); line-height: 1.5; }
+  h2 { font-size: var(--text-xl);  font-weight: var(--font-weight-medium); line-height: 1.5; }
+  h3 { font-size: var(--text-lg);  font-weight: var(--font-weight-medium); line-height: 1.5; }
+  h4 { font-size: var(--text-base); font-weight: var(--font-weight-medium); line-height: 1.5; }
+
+  label  { font-size: var(--text-base); font-weight: var(--font-weight-medium); line-height: 1.5; }
+  button { font-size: var(--text-base); font-weight: var(--font-weight-medium); line-height: 1.5; }
+  input  { font-size: var(--text-base); font-weight: var(--font-weight-normal);  line-height: 1.5; }
+}
