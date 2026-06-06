@@ -1,12 +1,11 @@
-package com.project.backend.prompt.dto;
+package com.project.backend.domain.prompt.dto;
 
-
-import com.project.backend.prompt.enums.AiType;
-import com.project.backend.prompt.enums.PromptCategory;
-import lombok.Getter;
-import jakarta.validation.constraints.NotNull;
+import com.project.backend.domain.prompt.entity.AiType;
+import com.project.backend.domain.prompt.entity.PromptCategory;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 
 @Getter
 public class PromptCreateRequest {
@@ -19,7 +18,6 @@ public class PromptCreateRequest {
 
     @NotBlank(message = "미리보기는 필수입니다.")
     private String preview;
-
 
     private String thumbnailUrl;
 

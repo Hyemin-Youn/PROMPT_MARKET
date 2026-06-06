@@ -1,7 +1,7 @@
-package com.project.backend.prompt.dto;
+package com.project.backend.domain.prompt.dto;
 
-import com.project.backend.prompt.enums.AiType;
-import com.project.backend.prompt.enums.PromptCategory;
+import com.project.backend.domain.prompt.entity.AiType;
+import com.project.backend.domain.prompt.entity.PromptCategory;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +29,4 @@ public class PromptUpdateRequest {
 
     @NotNull(message = "AI 종류는 필수입니다.")
     private AiType aiType;
-
-
 }
