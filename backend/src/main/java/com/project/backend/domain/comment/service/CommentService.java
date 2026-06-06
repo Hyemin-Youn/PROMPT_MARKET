@@ -33,7 +33,7 @@ public class CommentService {
 
 
         List<Comment> commentList =
-                commentRepository.findAllByPromptIdAndStatus(prompt.getPromptId(), CommentStatus.ACTIVE);
+                commentRepository.findAllByPromptPromptIdAndStatus(prompt.getPromptId(), CommentStatus.ACTIVE);
 
 
         return commentList.stream()

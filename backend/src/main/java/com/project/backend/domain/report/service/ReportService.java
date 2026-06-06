@@ -136,7 +136,7 @@ public class ReportService {
     private void completeProcessedReport(ReportTargetType targetType, Long targetId) {
         switch (targetType) {
             case PROMPT -> promptRepository.findById(targetId).ifPresent(prompt -> {
-                prompt.updateStatus(PromptStatus.HIDDEN);
+                prompt.hide();
             });
 
             case COMMENT -> commentRepository.findById(targetId).ifPresent(Comment::deleteComment);
