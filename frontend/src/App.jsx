@@ -60,6 +60,13 @@ const AppContent = () => {
 
     const showFooter = location.pathname === "/";
 
+    const libraryProps = {
+        purchasedPrompts,
+        onLogout: handleLogout,
+        onSelectPrompt: (id) => navigate(`/detail/${id}`),
+        userEmail,
+    };
+
     return (
         <div className="min-h-screen flex flex-col" style={{ background: "#0b0b12", fontFamily: "'Inter', 'Pretendard', sans-serif" }}>
             <Navbar
@@ -83,20 +90,12 @@ const AppContent = () => {
                 <Routes>
                     <Route path="/" element={<HomePage onSelectPrompt={(id) => navigate(`/detail/${id}`)} purchasedPrompts={purchasedPrompts} />} />
                     <Route path="/detail/:id" element={<PromptDetailPageWrapper onPurchase={handlePurchase} isLoggedIn={isLoggedIn} purchasedPrompts={purchasedPrompts} />} />
-                    {["/library", "/profile", "/favorites", "/settings"].map((path) => (
-                        <Route key={path} path={path} element={
-                            isLoggedIn ? (
-                                <LibraryPage
-                                    purchasedPrompts={purchasedPrompts}
-                                    onLogout={handleLogout}
-                                    onSelectPrompt={(id) => navigate(`/detail/${id}`)}
-                                    userEmail={userEmail}
-                                />
-                            ) : (
-                                <Navigate to="/" replace />
-                            )
-                        } />
-                    ))}
+
+                    <Route path="/library"   element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="purchases" /> : <Navigate to="/" replace />} />
+                    <Route path="/profile"   element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="profile"   /> : <Navigate to="/" replace />} />
+                    <Route path="/favorites" element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="favorites" /> : <Navigate to="/" replace />} />
+                    <Route path="/settings"  element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="settings"  /> : <Navigate to="/" replace />} />
+
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </main>
