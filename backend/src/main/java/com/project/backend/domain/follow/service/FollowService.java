@@ -1,6 +1,7 @@
 package com.project.backend.domain.follow.service;
 
 
+import com.project.backend.domain.follow.dto.FollowCountResponseDto;
 import com.project.backend.domain.follow.dto.FollowResponseDto;
 import com.project.backend.domain.follow.entity.Follow;
 import com.project.backend.domain.follow.repository.FollowRepository;
@@ -84,5 +85,17 @@ public class FollowService {
         return followers.stream()
                 .map(follow -> new FollowResponseDto(follow.getFollower()))
                 .toList();
+    }
+
+    // 팔로우, 팔로잉 count 정보
+    public FollowCountResponseDto getFollowCounts(String email) {
+
+        PromptUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        long followerCount = followRepository.countByFollowingId(user.getId());
+        long followingCount = followRepository.countByFollowerId(user.getId());
+
+        return new FollowCountResponseDto(followerCount, followingCount);
     }
 }

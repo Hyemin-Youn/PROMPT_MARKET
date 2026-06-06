@@ -1,5 +1,6 @@
 package com.project.backend.domain.follow.controller;
 
+import com.project.backend.domain.follow.dto.FollowCountResponseDto;
 import com.project.backend.domain.follow.dto.FollowResponseDto;
 import com.project.backend.domain.follow.service.FollowService;
 import com.project.backend.global.common.response.ApiResponse;
@@ -55,4 +56,14 @@ public class FollowController {
         return ResponseEntity.ok(ApiResponse.success(followers));
     }
 
+    // 팔로워&팔로잉 수
+    @GetMapping("/follow/counts")
+    public ResponseEntity<ApiResponse<FollowCountResponseDto>> getMyFollowCounts(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+        FollowCountResponseDto followCounts = followService.getFollowCounts(email);
+
+        return ResponseEntity.ok(ApiResponse.success(followCounts));
+    }
 }
