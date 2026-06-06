@@ -41,7 +41,7 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
     return Object.keys(e).length === 0;
   };
 
-  const handleLoginSubmit = () => { if (validateLogin()) onSuccess(); };
+  const handleLoginSubmit = () => { if (validateLogin()) onSuccess(null, form.email); };
   const handleSignupNext = () => {
     if (step === 1 && validateSignup1()) setStep(2);
     else if (step === 2 && validateSignup2()) setStep(3);
@@ -189,7 +189,7 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
                       <span style={{ color: "var(--brand-violet-light)" }}>{form.nickname || form.name}</span>님, PromptMart에 오신 걸 환영합니다
                     </p>
                   </div>
-                  <button onClick={() => onSuccess()} className="w-full py-2.5 rounded-lg font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--gradient-primary)" }}>시작하기</button>
+                  <button onClick={() => onSuccess(null, form.email)} className="w-full py-2.5 rounded-lg font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--gradient-primary)" }}>시작하기</button>
                 </div>
               )}
 

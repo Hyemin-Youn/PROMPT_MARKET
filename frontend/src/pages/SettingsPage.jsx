@@ -1,21 +1,26 @@
 import { useState } from "react";
-import { User, Lock, Bell, Crown, Shield, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { User, Lock, Bell, ShoppingBag, Shield, Eye, EyeOff, AlertTriangle } from "lucide-react";
 
-export function SettingsPage({ isPremium, onLogout, onUpgradePremium }) {
+export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail }) {
   const [activeSection, setActiveSection] = useState("account");
   const [showPw, setShowPw] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [accountForm, setAccountForm] = useState({ name: "윤혜민", nickname: "dev_hyemin", email: "dev.hyemin@example.com", bio: "스타일 통합 담당 · Spring Boot / React 개발자" });
+  const [accountForm, setAccountForm] = useState({
+    name: userEmail ? userEmail.split("@")[0] : "",
+    nickname: "",
+    email: userEmail || "",
+    bio: ""
+  });
   const [notifications, setNotifications] = useState({ newComment: true, newFollower: true, purchase: true, promo: false, weekly: true });
 
   const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
 
   const NAV = [
-    { key: "account",      label: "계정 정보", icon: User  },
-    { key: "security",     label: "보안",      icon: Lock  },
-    { key: "notification", label: "알림 설정", icon: Bell  },
-    { key: "subscription", label: "구독 관리", icon: Crown },
+    { key: "account",      label: "계정 정보", icon: User       },
+    { key: "security",     label: "보안",      icon: Lock       },
+    { key: "notification", label: "알림 설정", icon: Bell       },
+    { key: "subscription", label: "결제 관리", icon: ShoppingBag },
   ];
 
   const inputStyle = (disabled = false) => ({
@@ -28,9 +33,7 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium }) {
       <div className="min-h-screen pb-16" style={{ background: "var(--background)" }}>
         <div className="max-w-4xl mx-auto px-4 pt-8">
           <h1 className="font-semibold mb-6" style={{ color: "var(--foreground)", fontSize: "1.1rem" }}>설정</h1>
-
           <div className="flex flex-col sm:flex-row gap-5">
-            {/* Side nav */}
             <div className="sm:w-44 shrink-0">
               <div className="rounded-xl overflow-hidden" style={{ background: "var(--card)", border: "1px solid var(--border-sm)" }}>
                 {NAV.map(({ key, label, icon: Icon }) => (
@@ -48,14 +51,16 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium }) {
                     <div className="rounded-xl p-5" style={{ background: "var(--card)", border: "1px solid var(--border-sm)" }}>
                       <h2 className="text-sm font-medium mb-4" style={{ color: "var(--foreground)" }}>기본 정보</h2>
                       <div className="flex items-center gap-4 mb-5">
-                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white" style={{ background: "var(--gradient-profile)" }}>윤</div>
+                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white" style={{ background: "var(--gradient-profile)" }}>
+                          {userEmail ? userEmail[0].toUpperCase() : "U"}
+                        </div>
                         <button className="text-sm px-3 py-1.5 rounded-lg transition-all hover:bg-white/5" style={{ color: "var(--brand-violet-light)", border: "1px solid var(--border-lg)" }}>사진 변경</button>
                       </div>
                       <div className="space-y-3">
                         {[
-                          { label: "이름",   key: "name",     placeholder: "홍길동",           disabled: false },
-                          { label: "닉네임", key: "nickname", placeholder: "dev_nickname",     disabled: false },
-                          { label: "이메일", key: "email",    placeholder: "dev@example.com",  disabled: true  },
+                          { label: "이름",   key: "name",     placeholder: "이름",             disabled: false },
+                          { label: "닉네임", key: "nickname", placeholder: "닉네임",           disabled: false },
+                          { label: "이메일", key: "email",    placeholder: "이메일",           disabled: true  },
                         ].map(({ label, key, placeholder, disabled }) => (
                             <div key={key}>
                               <label className="block text-xs mb-1" style={{ color: "var(--muted-foreground)" }}>{label}</label>
@@ -141,11 +146,11 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium }) {
                       <h2 className="text-sm font-medium" style={{ color: "var(--foreground)" }}>알림 설정</h2>
                     </div>
                     {[
-                      { key: "newComment",  label: "새 댓글 알림",   desc: "내 프롬프트에 댓글이 달리면 알림" },
-                      { key: "newFollower", label: "새 팔로워 알림",  desc: "누군가 나를 팔로우하면 알림" },
-                      { key: "purchase",    label: "구매 알림",       desc: "프롬프트 구매/판매 시 알림" },
-                      { key: "promo",       label: "프로모션 알림",   desc: "할인 및 이벤트 정보 (선택)" },
-                      { key: "weekly",      label: "주간 리포트",     desc: "매주 월요일 활동 요약 메일" },
+                      { key: "newComment",  label: "새 댓글 알림",  desc: "내 프롬프트에 댓글이 달리면 알림" },
+                      { key: "newFollower", label: "새 팔로워 알림", desc: "누군가 나를 팔로우하면 알림" },
+                      { key: "purchase",    label: "구매 알림",      desc: "프롬프트 구매/판매 시 알림" },
+                      { key: "promo",       label: "프로모션 알림",  desc: "할인 및 이벤트 정보 (선택)" },
+                      { key: "weekly",      label: "주간 리포트",    desc: "매주 월요일 활동 요약 메일" },
                     ].map(({ key, label, desc }, i, arr) => (
                         <div key={key} className="flex items-center justify-between px-5 py-4" style={{ borderBottom: i < arr.length - 1 ? "1px solid var(--border-xs)" : undefined }}>
                           <div>
@@ -164,40 +169,30 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium }) {
 
               {activeSection === "subscription" && (
                   <div className="space-y-4">
-                    <div className="rounded-xl p-5" style={{ background: "var(--card)", border: isPremium ? "1px solid var(--gold-border-md)" : "1px solid var(--border-sm)" }}>
+                    <div className="rounded-xl p-5" style={{ background: "var(--card)", border: "1px solid var(--border-sm)" }}>
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: isPremium ? "var(--gold-bg)" : "var(--muted)" }}>
-                          <Crown size={18} style={{ color: isPremium ? "var(--brand-gold)" : "var(--muted-foreground)" }} />
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: isPremium ? "var(--primary-bg-md)" : "var(--muted)" }}>
+                          <ShoppingBag size={18} style={{ color: isPremium ? "var(--brand-violet-light)" : "var(--muted-foreground)" }} />
                         </div>
                         <div>
-                          <h2 className="font-medium" style={{ color: "var(--foreground)" }}>{isPremium ? "프리미엄 구독 중" : "무료 플랜"}</h2>
-                          <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{isPremium ? "다음 결제일 2025-06-20 · 월 29,000원" : "무료 샘플 및 가이드 열람 가능"}</p>
+                          <h2 className="font-medium" style={{ color: "var(--foreground)" }}>{isPremium ? "유료회원" : "무료회원"}</h2>
+                          <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{isPremium ? "프롬프트 구매 이력이 있습니다" : "아직 구매한 프롬프트가 없습니다"}</p>
                         </div>
                       </div>
-                      <div className="space-y-2 mb-4">
+                      <div className="space-y-2">
                         {[
-                          { label: "프롬프트 마켓 열람",    free: true,  premium: true  },
-                          { label: "샘플 결과물 확인",      free: true,  premium: true  },
-                          { label: "사용 가이드 열람",      free: true,  premium: true  },
-                          { label: "프롬프트 전체 다운로드", free: false, premium: true  },
-                          { label: "무제한 라이브러리",     free: false, premium: true  },
-                          { label: "프롬프트 등록·판매",    free: false, premium: true  },
+                          { label: "프롬프트 마켓 열람",      free: true,  premium: true },
+                          { label: "샘플 결과물 확인",         free: true,  premium: true },
+                          { label: "사용 가이드 열람",         free: true,  premium: true },
+                          { label: "프롬프트 전체 내용 열람",  free: false, premium: true },
                         ].map(({ label, free, premium }) => (
                             <div key={label} className="flex items-center gap-3 text-sm">
                               <span className="flex-1" style={{ color: "var(--secondary-foreground)" }}>{label}</span>
                               <span style={{ color: free ? "var(--success)" : "var(--muted-foreground)" }}>{free ? "✓" : "✗"}</span>
-                              <span style={{ color: premium ? "var(--brand-gold)" : "var(--muted-foreground)" }}>{premium ? "✓" : "✗"}</span>
+                              <span style={{ color: premium ? "var(--success)" : "var(--muted-foreground)" }}>{premium ? "✓" : "✗"}</span>
                             </div>
                         ))}
                       </div>
-                      {!isPremium && (
-                          <button onClick={onUpgradePremium} className="w-full py-2.5 rounded-lg font-medium transition-opacity hover:opacity-90" style={{ background: "var(--brand-gold)", color: "var(--brand-gold-foreground)" }}>
-                            프리미엄 가입하기 · 월 29,000원
-                          </button>
-                      )}
-                      {isPremium && (
-                          <button className="w-full py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-white/5" style={{ color: "var(--destructive)", border: "1px solid var(--destructive-border-sm)" }}>구독 취소</button>
-                      )}
                     </div>
                     <div className="rounded-xl p-5" style={{ background: "var(--card)", border: "1px solid var(--border-sm)" }}>
                       <h2 className="text-sm font-medium mb-3" style={{ color: "var(--foreground)" }}>결제 수단</h2>
