@@ -1,6 +1,7 @@
 package com.project.backend.domain.comment.repository;
 
 import com.project.backend.domain.comment.entity.Comment;
+import com.project.backend.domain.comment.entity.CommentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +10,5 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findAllByPromptPromptId(Long promptId);
+    List<Comment> findAllByPromptIdAndStatus(Long promptId, CommentStatus status);
 }

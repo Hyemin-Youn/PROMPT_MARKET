@@ -3,6 +3,7 @@ package com.project.backend.domain.comment.service;
 import com.project.backend.domain.comment.dto.CommentRequestDto;
 import com.project.backend.domain.comment.dto.CommentResponseDto;
 import com.project.backend.domain.comment.entity.Comment;
+import com.project.backend.domain.comment.entity.CommentStatus;
 import com.project.backend.domain.comment.repository.CommentRepository;
 import com.project.backend.domain.prompt.entity.Prompt;
 import com.project.backend.domain.prompt.repository.PromptRepository;
@@ -25,15 +26,14 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PromptRepository promptRepository;
 
-
-
     public List<CommentResponseDto> getComments(Long promptId) {
 
         Prompt prompt = promptRepository.findById(promptId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROMPT_NOT_FOUND));
 
 
-        List<Comment> commentList = commentRepository.findAllByPromptPromptId(promptId);
+        List<Comment> commentList =
+                commentRepository.findAllByPromptIdAndStatus(prompt.getPromptId(), CommentStatus.ACTIVE);
 
 
         return commentList.stream()
