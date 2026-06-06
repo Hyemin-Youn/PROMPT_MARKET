@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
-import { Navbar } from "./components/Navbar.jsx";
+import { Navbar } from "./components/layout/Navbar.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
-import { HomePage } from "./components/HomePage.jsx";
-import { PromptDetailPage } from "./components/PromptDetailPage.jsx";
-import { LibraryPage } from "./components/LibraryPage.jsx";
-import { AuthModal } from "./components/AuthModal.jsx";
+import { HomePage } from "./pages/HomePage.jsx";
+import { PromptDetailPage } from "./pages/PromptDetailPage.jsx";
+import { LibraryPage } from "./pages/LibraryPage.jsx";
+import { AuthModal } from "./components/auth/AuthModal.jsx";
 
 const AppContent = () => {
     const navigate = useNavigate();
