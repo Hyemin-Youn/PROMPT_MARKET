@@ -1,6 +1,6 @@
 package com.project.backend.domain.comment.entity;
 
-import com.project.backend.prompt.entity.Prompt;
+import com.project.backend.domain.prompt.entity.Prompt;
 import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -55,5 +55,4 @@ public class Comment extends BaseEntity {
     public void deleteComment() {
         this.status = CommentStatus.DELETED;
     }
-
 }
