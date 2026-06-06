@@ -76,6 +76,7 @@ const AppContent = () => {
                 onOpenLogin={() => setAuthModal("login")}
                 onOpenSignup={() => setAuthModal("signup")}
                 onLogout={handleLogout}
+                userEmail={userEmail}
             />
 
             <main className="flex-1">
