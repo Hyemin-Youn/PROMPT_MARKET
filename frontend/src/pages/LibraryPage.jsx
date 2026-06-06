@@ -32,8 +32,9 @@ const NAV_ITEMS = [
     { icon: Settings,    label: "설정",      key: "settings" },
 ];
 
-export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEmail }) => {
-    const [activeNav, setActiveNav] = useState("purchases");
+// 이걸로
+export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEmail, initialNav }) => {
+    const [activeNav, setActiveNav] = useState(initialNav || "purchases");
     const [activePrompt, setActivePrompt] = useState(0);
     const [copied, setCopied] = useState(false);
     const [selectedExample, setSelectedExample] = useState(null);
