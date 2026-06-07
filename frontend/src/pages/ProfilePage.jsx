@@ -7,7 +7,7 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
   // 백엔드 연동 상태 관리들
   const [myPrompts, setMyPrompts] = useState([]);
   const [activities, setActivities] = useState([]);
-  const [followData, setFollowData] = useState({ followers: [], followings: [] });
+  const [followData, setFollowData] = useState({ followers: [], followings: [], counts: { followerCount: 0, followingCount: 0 } });
 
   // 모달 상태 관리 (팔로워/팔로잉 목록 확인용)
   const [activeFollowModal, setActiveFollowModal] = useState(null); // 'followers' | 'followings' | null
@@ -77,7 +77,7 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
                       className="hover:text-purple-400 transition-colors text-left"
                       style={{ color: "var(--foreground)" }}
                   >
-                    팔로워 <span className="font-bold text-purple-400 ml-1">{followData.followers.length}</span>
+                    팔로워 <span className="font-bold text-purple-400 ml-1">{followData.counts.followerCount}</span>
                   </button>
                   <span className="w-1 h-1 rounded-full bg-gray-700" />
                   <button
@@ -85,7 +85,7 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
                       className="hover:text-purple-400 transition-colors text-left"
                       style={{ color: "var(--foreground)" }}
                   >
-                    팔로잉 <span className="font-bold text-purple-400 ml-1">{followData.followings.length}</span>
+                    팔로잉 <span className="font-bold text-purple-400 ml-1">{followData.counts.followingCount}</span>
                   </button>
                 </div>
 
@@ -234,7 +234,7 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
                               {user.email ? user.email[0].toUpperCase() : "U"}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-200 truncate">{user.name || "사용자"}</p>
+                              <p className="text-sm font-medium text-gray-200 truncate">{user.nickname || "사용자"}</p>
                               <p className="text-xs text-gray-500 truncate">{user.email}</p>
                             </div>
                           </div>
