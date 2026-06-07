@@ -6,5 +6,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class PurchaseRequestDto {
-    private Long promptId;
+    private Long promptid;
+
 }
