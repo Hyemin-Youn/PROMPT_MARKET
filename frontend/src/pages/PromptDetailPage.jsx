@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { Star, Download, Heart, Code2, ChevronLeft, ShoppingCart, CheckCircle2, ShieldAlert, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isPurchased }) => {
   const [activeTab, setActiveTab] = useState("샘플");
   const [liked, setLiked] = useState(false);
   const [activeRating, setActiveRating] = useState("전체");
+  const navigate = useNavigate();
+  const currentUserId = 1; // JWT 연동 전 임시값
 
   // 백엔드로부터 받아올 실제 프롬프트 정보 상태 객체
   const [promptData, setPromptData] = useState({
@@ -20,6 +23,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
     guideSteps: [], // 백엔드에서 배열 형태로 넘겨준다고 가정
     content: "" // 구매 완료 시 열어줄 실제 프롬프트 내용
   });
+  const isOwner = Number(promptData.userId) === currentUserId; //
 
   const [reviews, setReviews] = useState([]);
   const [newComment, setNewComment] = useState("");
@@ -170,6 +174,39 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
       console.error("찜하기 실패:", error);
     }
   };
+
+
+  const handleDelete = async () => {
+
+    if (!window.confirm("정말 삭제하시겠습니까?")) {
+      return;
+    }
+
+    try {
+
+      const response = await fetch(
+          `http://localhost:8080/api/prompts/${promptId}?userId=1`,
+          {
+            method: "DELETE",
+            credentials: "include",
+          }
+      );
+
+      if (!response.ok) {
+        alert("삭제 실패");
+        return;
+      }
+
+      alert("삭제되었습니다.");
+      navigate("/");
+
+    } catch (error) {
+      console.error(error);
+      alert("서버와 통신할 수 없습니다.");
+    }
+  };
+
+
 
   // 상세 페이지 진입 및 변경시 모든 정보 유기적 결합
   useEffect(() => {
@@ -438,6 +475,27 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
                       <ShieldAlert size={14} /> 게시글 신고
                     </button>
                   </div>
+
+                  {/* 수정 & 삭제 */}
+                  {isOwner && (
+                      <>
+                        <button
+                            onClick={() => navigate(`/prompts/edit/${promptId}`)}
+                            className="w-full mt-2 py-2.5 rounded-lg font-medium text-white"
+                            style={{ background: "#7c3aed" }}
+                        >
+                          수정하기
+                        </button>
+
+                        <button
+                            onClick={handleDelete}
+                            className="w-full mt-2 py-2.5 rounded-lg font-medium text-white"
+                            style={{ background: "#dc2626" }}
+                        >
+                          삭제하기
+                        </button>
+                      </>
+                  )}
 
                   <div className="space-y-1.5 pt-1 border-t" style={{ borderColor: "var(--border-xs)" }}>
                     {[["AI 모델", promptData.aiModel || "공통"], ["카테고리", promptData.category || "개발"], ["파일 형식", promptData.fileFormat || "Markdown"]].map(([k, v]) => (

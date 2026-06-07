@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Star, Download, Edit2, Code2, CheckCircle2, TrendingUp, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
 
   // 백엔드 연동 상태 관리들
@@ -161,7 +163,9 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm" style={{ color: "var(--muted-foreground)" }}>등록한 프롬프트 {myPrompts.length}개</span>
-                  <button className="text-sm px-3 py-1.5 rounded-lg font-medium text-white" style={{ background: "var(--primary)" }}>+ 프롬프트 등록</button>
+                  <button
+                      onClick={() => navigate("/prompts/new")}
+                      className="text-sm px-3 py-1.5 rounded-lg font-medium text-white" style={{ background: "var(--primary)" }}>+ 프롬프트 등록</button>
                 </div>
                 {myPrompts.length === 0 ? (
                     <p className="text-sm text-gray-500 p-4 text-center">등록된 프롬프트가 없습니다.</p>

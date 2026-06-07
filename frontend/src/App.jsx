@@ -3,9 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocat
 import { Navbar } from "./components/layout/Navbar.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
 import { HomePage } from "./pages/HomePage.jsx";
-import { PromptDetailPage } from "./pages/PromptDetailPage.jsx";
+import { PromptDetailPage }  from "./pages/PromptDetailPage.jsx";
 import { LibraryPage } from "./pages/LibraryPage.jsx";
 import { AuthModal } from "./components/auth/AuthModal.jsx";
+import { PromptCreatePage } from "./pages/PromptCreatePage.jsx";
+import { PromptEditPage } from "./pages/PromptEditPage.jsx";
 
 const AppContent = () => {
     const navigate = useNavigate();
@@ -156,9 +158,10 @@ const AppContent = () => {
 
                     <Route path="/library"   element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="purchases" /> : <Navigate to="/" replace />} />
                     <Route path="/profile"   element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="profile"   /> : <Navigate to="/" replace />} />
+                    <Route path="/prompts/new" element={<PromptCreatePage />} />
                     <Route path="/favorites" element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="favorites" /> : <Navigate to="/" replace />} />
                     <Route path="/settings"  element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="settings"  /> : <Navigate to="/" replace />} />
-
+                    <Route path="/prompts/edit/:id" element={<PromptEditPage />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </main>
