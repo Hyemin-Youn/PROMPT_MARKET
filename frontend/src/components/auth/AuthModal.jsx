@@ -54,7 +54,26 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
     return Object.keys(e).length === 0;
   };
 
-  const handleLoginSubmit = () => { if (validateLogin()) onSuccess(null, form.email); };
+  const handleLoginSubmit = async () => {
+    if (!validateLogin()) return;
+    try {
+      const response = await fetch("http://localhost:8080/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: form.email, password: form.password }),
+      });
+      if (response.ok) {
+        onSuccess(null, form.email);
+      } else {
+        setErrors({ password: "이메일 또는 비밀번호가 올바르지 않습니다." });
+      }
+    } catch (error) {
+      console.error("로그인 에러:", error);
+      setErrors({ password: "서버와 통신할 수 없습니다." });
+    }
+  };
+
   const handleSignupNext = () => {
     if (step === 1 && validateSignup1()) setStep(2);
     else if (step === 2 && validateSignup2()) setStep(3);
