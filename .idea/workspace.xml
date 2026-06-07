@@ -6,9 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f501094b-7467-4171-ba0f-81bb41cbc669" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/purchase/controller/PurchaseController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/purchase/controller/PurchaseController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/purchase/repository/PurchaseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/purchase/repository/PurchaseRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/purchase/service/PurchaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/project/backend/domain/purchase/service/PurchaseService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/FavoritesPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/FavoritesPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LibraryPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LibraryPage.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
