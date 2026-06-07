@@ -10,7 +10,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -65,5 +67,21 @@ public class FollowController {
         FollowCountResponseDto followCounts = followService.getFollowCounts(email);
 
         return ResponseEntity.ok(ApiResponse.success(followCounts));
+    }
+
+
+    @GetMapping("/follow-info")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getMyFollowInfo(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+
+        // 팔로워/팔로잉 목록 + 카운트 정보를 합쳐서 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("followers", followService.getFollowers(email));
+        response.put("followings", followService.getFollowings(email));
+        response.put("counts", followService.getFollowCounts(email));
+
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }
