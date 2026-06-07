@@ -35,6 +35,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
   const ratings = ["전체", "5점", "4점", "3점", "2점", "1점"];
 
   const fetchPromptDetails = async () => {
+    if (!promptId) return; // ✅ 가드 추가
     try {
       const response = await fetch(`http://localhost:8080/api/prompts/${promptId}`, {
         method: "GET",
@@ -50,6 +51,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
   };
 
   const fetchComments = async () => {
+    if (!promptId) return; // ✅ 가드 추가
     try {
       const response = await fetch(`http://localhost:8080/api/prompts/${promptId}/comments`);
       if (response.ok) {
@@ -127,6 +129,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
   };
 
   const checkLikeStatus = async () => {
+    if (!promptId) return; // ✅ 가드 추가
     try {
       const response = await fetch(`http://localhost:8080/api/prompts/${promptId}/is-liked`, {
         method: "GET",
@@ -176,6 +179,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
   };
 
   useEffect(() => {
+    if (!promptId) return; // ✅ 가드 추가
     fetchPromptDetails();
     fetchComments();
     if (isLoggedIn) {
