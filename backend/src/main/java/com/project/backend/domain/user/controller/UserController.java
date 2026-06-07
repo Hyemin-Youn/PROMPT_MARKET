@@ -97,7 +97,6 @@ public class UserController {
             HttpServletRequest request, HttpServletResponse response,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // ✅ null 체크 추가
         if (userDetails == null) {
             return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
         }
@@ -113,7 +112,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("로그아웃 성공"));
     }
 
-    // ✅ 없는 엔드포인트 추가
     @GetMapping("/my-prompts")
     public ResponseEntity<ApiResponse<List<Object>>> getMyPrompts(
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -124,12 +122,12 @@ public class UserController {
     }
 
     @GetMapping("/activity")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> getActivity(
+    public ResponseEntity<ApiResponse<List<Object>>> getActivity(
             @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
         }
-        return ResponseEntity.ok(ApiResponse.success(Map.of()));
+        return ResponseEntity.ok(ApiResponse.success(List.of())); // ✅ Map.of() → List.of()
     }
 
     private String extractCookie(HttpServletRequest request, String name) {
