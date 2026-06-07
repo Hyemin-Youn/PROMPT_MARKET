@@ -34,7 +34,7 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
         });
         if (response.ok) {
           const data = await response.json();
-          setPrompts(data.data?.content || []);
+          setPrompts(Array.isArray(data) ? data : []);
         }
       } catch (error) {
         console.error("프롬프트 목록 로드 실패:", error);
@@ -138,9 +138,9 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredPrompts.map(prompt => {
-                const isPurchased = purchasedPrompts.includes(String(prompt.promptId));
+                const isPurchased = purchasedPrompts.includes(String(prompt.id));
                 return (
-                    <button key={prompt.promptId} onClick={() => onSelectPrompt(prompt.promptId)} className="text-left rounded-xl overflow-hidden transition-all hover:scale-[1.01]"
+                    <button key={prompt.id} onClick={() => onSelectPrompt(prompt.id)} className="text-left rounded-xl overflow-hidden transition-all hover:scale-[1.01]"
                             style={{ background: "var(--card)", border: "1px solid var(--border-sm)", boxShadow: "0 2px 12px rgba(124,58,237,0.10)" }}>
                       <div className="h-32 flex items-center justify-center relative" style={{ background: "#f3f0ff" }}>
                         <div className="absolute inset-0 opacity-60" style={{ background: "repeating-linear-gradient(45deg, transparent, transparent 10px, var(--primary-bg-xs) 10px, var(--primary-bg-xs) 20px)" }} />
