@@ -33,7 +33,7 @@ public class PurchaseService {
         Prompt prompt = promptRepository.findById(promptId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PROMPT_NOT_FOUND));
 
-        if (purchaseRepository.existsByUserUserIdAndPromptPromptId(user.getId(), promptId)) {
+        if (purchaseRepository.existsByUserIdAndPromptPromptId(user.getId(), promptId)) {
             throw new CustomException(ErrorCode.ALREADY_PURCHASED);
         }
 
@@ -58,6 +58,6 @@ public class PurchaseService {
         PromptUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return purchaseRepository.existsByUserUserIdAndPromptPromptId(user.getId(), promptId);
+        return purchaseRepository.existsByUserIdAndPromptPromptId(user.getId(), promptId);
     }
 }
