@@ -22,20 +22,19 @@ const ellipse = (top, left, right, bottom, w, h, color, opacity) => ({
 
 export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
   const [activeCategory, setActiveCategory] = useState("전체");
-  const [prompts, setPrompts] = useState([]); // 백엔드로부터 받아올 프롬프트 목록
-  const [searchQuery, setSearchQuery] = useState(""); // 통합 검색어 상태
+  const [prompts, setPrompts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // 백엔드 API로부터 프롬프트 목록 가져오기
   useEffect(() => {
     const fetchPrompts = async () => {
       try {
         const response = await fetch("http://localhost:8080/api/prompts", {
           method: "GET",
-          credentials: "include", // 인증 쿠키 포함
+          credentials: "include",
         });
         if (response.ok) {
           const data = await response.json();
-          setPrompts(data);
+          setPrompts(data.data?.content || []);
         }
       } catch (error) {
         console.error("프롬프트 목록 로드 실패:", error);
@@ -44,18 +43,15 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
     fetchPrompts();
   }, []);
 
-  // 카테고리 필터링 및 통합 검색창 필터링 동시 적용
   const filteredPrompts = prompts.filter(p => {
     const matchesCategory = activeCategory === "전체" || p.category === activeCategory;
-    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (p.tags && p.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   return (
       <div className="min-h-screen" style={{ background: "#0b0b12", position: "relative" }}>
 
-        {/* Hero 영역 (배경 스타일 유지) */}
         <section className="relative px-4 pt-16 pb-12 overflow-hidden" style={{ zIndex: 1, background: "#ffffff" }}>
           <div style={ellipse("-10%", "-5%", null, null, 800, 300, V, 0.55)} />
           <div style={ellipse("-15%", null, "-10%", null, 700, 280, L, 0.50)} />
@@ -87,8 +83,6 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
                 검증된 개발자용 AI 프롬프트<br />
                 GPT, Claude, Gemini 등 모든 AI 모델 지원
               </p>
-
-              {/* 🌟 통합된 단일 검색창 */}
               <div className="flex items-center gap-2 p-3 rounded-xl max-w-xl" style={{ background: "var(--card)", border: "1px solid var(--border-lg)" }}>
                 <Search size={16} style={{ color: "#ffffff" }} />
                 <input
@@ -103,7 +97,6 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
           </div>
         </section>
 
-        {/* Featured 배너 */}
         <section className="px-4 mb-10" style={{ position: "relative", zIndex: 1 }}>
           <div className="max-w-7xl mx-auto">
             <div className="rounded-xl overflow-hidden" style={{ background: "var(--gradient-card)", border: "1px solid var(--border-md)", boxShadow: "0 4px 24px rgba(124, 58, 237, 0.15)" }}>
@@ -124,7 +117,6 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
           </div>
         </section>
 
-        {/* 카테고리 탭 */}
         <section className="px-4 mb-6" style={{ position: "relative", zIndex: 1 }}>
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
@@ -138,7 +130,6 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
           </div>
         </section>
 
-        {/* 프롬프트 카드 목록 */}
         <section className="px-4 pb-16" style={{ position: "relative", zIndex: 1 }}>
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-4">
@@ -147,9 +138,9 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredPrompts.map(prompt => {
-                const isPurchased = purchasedPrompts.includes(prompt.id);
+                const isPurchased = purchasedPrompts.includes(String(prompt.promptId));
                 return (
-                    <button key={prompt.id} onClick={() => onSelectPrompt(prompt.id)} className="text-left rounded-xl overflow-hidden transition-all hover:scale-[1.01]"
+                    <button key={prompt.promptId} onClick={() => onSelectPrompt(prompt.promptId)} className="text-left rounded-xl overflow-hidden transition-all hover:scale-[1.01]"
                             style={{ background: "var(--card)", border: "1px solid var(--border-sm)", boxShadow: "0 2px 12px rgba(124,58,237,0.10)" }}>
                       <div className="h-32 flex items-center justify-center relative" style={{ background: "#f3f0ff" }}>
                         <div className="absolute inset-0 opacity-60" style={{ background: "repeating-linear-gradient(45deg, transparent, transparent 10px, var(--primary-bg-xs) 10px, var(--primary-bg-xs) 20px)" }} />
@@ -168,14 +159,12 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
                       <div className="p-4">
                         <h3 className="text-sm font-medium leading-snug mb-2" style={{ color: "var(--foreground)" }}>{prompt.title}</h3>
                         <div className="flex items-center gap-1 mb-3">
-                          {prompt.tags && prompt.tags.map(tag => (
-                              <span key={tag} className="px-2 py-0.5 rounded text-xs" style={{ background: "var(--muted)", color: "var(--muted-foreground)" }}>{tag}</span>
-                          ))}
+                          <span className="px-2 py-0.5 rounded text-xs" style={{ background: "var(--muted)", color: "var(--muted-foreground)" }}>{prompt.aiType}</span>
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3 text-xs" style={{ color: "var(--muted-foreground)" }}>
                             <span className="flex items-center gap-1"><Star size={11} style={{ color: "var(--brand-gold)" }} fill="var(--brand-gold)" />{prompt.rating}</span>
-                            <span className="flex items-center gap-1"><Download size={11} /> {prompt.downloads}</span>
+                            <span className="flex items-center gap-1"><Download size={11} /> {prompt.viewCount}</span>
                           </div>
                           <span className="font-semibold text-sm" style={{ color: isPurchased ? "var(--success)" : "var(--brand-violet-light)" }}>
                             {isPurchased ? "보기" : `${prompt.price ? prompt.price.toLocaleString() : 0}원`}
