@@ -21,6 +21,7 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
   const [form, setForm] = useState({ email: "", password: "", passwordConfirm: "", name: "", nickname: "" });
   const [errors, setErrors] = useState({});
   const [agreed, setAgreed] = useState({ terms: false, privacy: false, marketing: false });
+  const [signupLoading, setSignupLoading] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -74,9 +75,37 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
     }
   };
 
+  // ✅ 실제 회원가입 API 호출
+  const handleSignupSubmit = async () => {
+    if (!validateSignup2()) return;
+    setSignupLoading(true);
+    try {
+      const response = await fetch("http://localhost:8080/api/users/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          name: form.name,
+          nickname: form.nickname,
+        }),
+      });
+      if (response.ok) {
+        setStep(3);
+      } else {
+        const data = await response.json().catch(() => ({}));
+        setErrors({ name: data.message || "회원가입에 실패했습니다. 다시 시도해주세요." });
+      }
+    } catch (error) {
+      console.error("회원가입 에러:", error);
+      setErrors({ name: "서버와 통신할 수 없습니다." });
+    } finally {
+      setSignupLoading(false);
+    }
+  };
+
   const handleSignupNext = () => {
     if (step === 1 && validateSignup1()) setStep(2);
-    else if (step === 2 && validateSignup2()) setStep(3);
   };
 
   return (
@@ -215,24 +244,29 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
                             <span style={{ color: "var(--brand-violet-light)" }}>{form.nickname || form.name}</span>님, PromptMart에 오신 걸 환영합니다
                           </p>
                         </div>
-                        <button onClick={() => onSuccess(null, form.email)} className="w-full py-2.5 rounded-lg font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--gradient-primary)" }}>시작하기</button>
+                        <button onClick={() => onSwitchMode("login")} className="w-full py-2.5 rounded-lg font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--gradient-primary)" }}>로그인하러 가기</button>
                       </div>
                   )}
 
-                  {step < 3 && (
+                  {step === 1 && (
                       <>
                         <button onClick={handleSignupNext} className="w-full py-2.5 rounded-lg font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--gradient-primary)" }}>
-                          {step === 1 ? "다음" : "가입 완료"}
+                          다음
                         </button>
-                        {step === 1 && (
-                            <p className="text-center text-sm" style={{ color: "var(--muted-foreground)" }}>
-                              이미 계정이 있으신가요?{" "}
-                              <button onClick={() => onSwitchMode("login")} className="font-medium hover:underline" style={{ color: "var(--brand-violet-light)" }}>로그인</button>
-                            </p>
-                        )}
-                        {step === 2 && (
-                            <button onClick={() => setStep(1)} className="w-full text-sm text-center hover:underline" style={{ color: "var(--muted-foreground)" }}>이전으로</button>
-                        )}
+                        <p className="text-center text-sm" style={{ color: "var(--muted-foreground)" }}>
+                          이미 계정이 있으신가요?{" "}
+                          <button onClick={() => onSwitchMode("login")} className="font-medium hover:underline" style={{ color: "var(--brand-violet-light)" }}>로그인</button>
+                        </p>
+                      </>
+                  )}
+
+                  {step === 2 && (
+                      <>
+                        {/* ✅ 가입 완료 버튼 → 실제 API 호출 */}
+                        <button onClick={handleSignupSubmit} disabled={signupLoading} className="w-full py-2.5 rounded-lg font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--gradient-primary)", opacity: signupLoading ? 0.7 : 1 }}>
+                          {signupLoading ? "가입 중..." : "가입 완료"}
+                        </button>
+                        <button onClick={() => setStep(1)} className="w-full text-sm text-center hover:underline" style={{ color: "var(--muted-foreground)" }}>이전으로</button>
                       </>
                   )}
                 </div>
