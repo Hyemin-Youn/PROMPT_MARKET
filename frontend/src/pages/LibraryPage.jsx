@@ -3,6 +3,7 @@ import { User, ShoppingBag, Heart, Settings, Copy, CheckCheck, ChevronRight, Dow
 import { ProfilePage } from "./ProfilePage.jsx";
 import { FavoritesPage } from "./FavoritesPage.jsx";
 import { SettingsPage } from "./SettingsPage.jsx";
+import { useNavigate } from "react-router-dom";
 
 const NAV_ITEMS = [
     { icon: ShoppingBag, label: "구매 내역", key: "purchases" },
@@ -16,6 +17,8 @@ export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEm
     const [activePrompt, setActivePrompt] = useState(0);
     const [copied, setCopied] = useState(false);
     const [selectedExample, setSelectedExample] = useState(null);
+
+    const navigate = useNavigate();
 
     // 🌟 백엔드에서 받아올 실제 구매한 프롬프트 목록 상태
     const [purchasedList, setPurchasedList] = useState([]);
@@ -67,6 +70,12 @@ export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEm
         navigator.clipboard.writeText(currentPrompt.promptTemplate);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+
+    // '찜'한 프롬프트 상세 보기 메서드 (FavoritePage전용)
+    const handleSelectPromptFromFavorites = (promptId) => {
+        navigate(`/detail/${promptId}`);
     };
 
     return (
@@ -224,7 +233,9 @@ export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEm
                 )}
 
                 {activeNav === "profile"   && <ProfilePage isPremium={purchasedPrompts.length > 0} onUpgradePremium={() => {}} userEmail={userEmail} />}
-                {activeNav === "favorites" && <FavoritesPage onSelectPrompt={onSelectPrompt} />}
+                {activeNav === "favorites" && (
+                    <FavoritesPage onSelectPrompt={handleSelectPromptFromFavorites} />
+                )}
                 {activeNav === "settings"  && <SettingsPage isPremium={purchasedPrompts.length > 0} onLogout={onLogout} onUpgradePremium={() => {}} userEmail={userEmail} />}
             </div>
         </div>
