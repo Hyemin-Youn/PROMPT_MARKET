@@ -1,18 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heart, Star, Download, Trash2, Code2, Crown } from "lucide-react";
-
 
 export const FavoritesPage = ({ onSelectPrompt }) => {
   const [items, setItems] = useState([]);
   const [removed, setRemoved] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-
-  // '찜'목록 가져오기
   useEffect(() => {
     const fetchLikedPrompts = async () => {
+      setLoading(true);
       try {
         const response = await fetch("http://localhost:8080/api/prompts/liked", {
-          credentials: "include"
+          method: "GET",
+          credentials: "include",
         });
         if (response.ok) {
           const result = await response.json();
@@ -20,21 +20,20 @@ export const FavoritesPage = ({ onSelectPrompt }) => {
         }
       } catch (error) {
         console.error("찜 목록 로드 실패:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchLikedPrompts();
   }, []);
-
-
 
   const handleRemove = async (promptId) => {
     setRemoved(promptId);
     try {
       await fetch(`http://localhost:8080/api/prompts/${promptId}/likes`, {
         method: "POST",
-        credentials: "include"
+        credentials: "include",
       });
-
       setTimeout(() => {
         setItems(prev => prev.filter(i => i.promptId !== promptId));
         setRemoved(null);
@@ -58,7 +57,9 @@ export const FavoritesPage = ({ onSelectPrompt }) => {
             </div>
           </div>
 
-          {items.length === 0 ? (
+          {loading && <p className="text-sm text-center py-4" style={{ color: "var(--muted-foreground)" }}>찜 목록을 불러오는 중입니다...</p>}
+
+          {!loading && items.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-4 py-24">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: "var(--card)" }}>
                   <Heart size={28} style={{ color: "var(--muted-foreground)" }} />
@@ -71,8 +72,6 @@ export const FavoritesPage = ({ onSelectPrompt }) => {
                 {items.map(item => (
                     <div key={item.promptId} className="rounded-xl overflow-hidden transition-all"
                          style={{ background: "var(--card)", border: "1px solid var(--border-sm)", opacity: removed === item.promptId ? 0 : 1, transform: removed === item.promptId ? "scale(0.96)" : "scale(1)", transition: "all 0.3s ease" }}>
-
-                      {/* 상단 디자인 영역 */}
                       <div className="h-24 flex items-center justify-center relative" style={{ background: "var(--muted)" }}>
                         <Code2 size={24} style={{ color: "var(--brand-violet-light)", opacity: 0.4 }} />
                         <button onClick={() => handleRemove(item.promptId)} className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-110"
@@ -80,12 +79,9 @@ export const FavoritesPage = ({ onSelectPrompt }) => {
                           <Trash2 size={12} style={{ color: "var(--destructive)" }} />
                         </button>
                       </div>
-
-                      {/* 하단 정보 영역 */}
                       <div className="p-4">
                         <p className="text-sm font-medium mb-1 leading-snug" style={{ color: "var(--foreground)" }}>{item.title}</p>
-                        <p className="text-xs mb-4" style={{ color: "var(--muted-foreground)" }}>작성자: {item.authorNickname}</p>
-
+                        <p className="text-xs mb-3" style={{ color: "var(--muted-foreground)" }}>{item.authorNickname}</p>
                         <button onClick={() => onSelectPrompt(item.promptId)} className="w-full py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--primary)" }}>
                           자세히 보기
                         </button>

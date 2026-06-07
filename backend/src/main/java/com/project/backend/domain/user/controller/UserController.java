@@ -35,6 +35,9 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<Map<String, String>>> getMe(
             @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
+        }
         return ResponseEntity.ok(ApiResponse.success(Map.of("email", userDetails.getUsername())));
     }
 
