@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Bell, ShoppingBag, Menu, X, Zap, LogIn } from "lucide-react";
+import { Bell, ShoppingBag, Menu, X, Zap, LogIn } from "lucide-react";
 
 export const Navbar = ({ currentPage, onNavigate, isLoggedIn, purchaseCount, onOpenLogin, onOpenSignup, onLogout, userEmail }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,10 +21,6 @@ export const Navbar = ({ currentPage, onNavigate, isLoggedIn, purchaseCount, onO
           </span>
           </button>
 
-          <div className="flex-1 max-w-md hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: "var(--muted)", border: "1px solid var(--border)" }}>
-            <Search size={14} style={{ color: "var(--muted-foreground)" }} />
-            <input placeholder="프롬프트 검색..." autoComplete="off" className="flex-1 bg-transparent outline-none text-sm" style={{ color: "var(--foreground)" }} />
-          </div>
 
           <div className="hidden md:flex items-center gap-5 text-sm">
             <button onClick={() => onNavigate("home")} className="transition-colors" style={navLinkStyle("home")}>마켓</button>
@@ -93,10 +89,6 @@ export const Navbar = ({ currentPage, onNavigate, isLoggedIn, purchaseCount, onO
 
         {menuOpen && (
             <div className="md:hidden px-4 pb-4 flex flex-col gap-3" style={{ background: "var(--sidebar)", borderTop: "1px solid var(--border-sm)" }}>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg mt-3" style={{ background: "var(--muted)" }}>
-                <Search size={14} style={{ color: "var(--muted-foreground)" }} />
-                <input placeholder="프롬프트 검색..." autoComplete="off" className="flex-1 bg-transparent outline-none text-sm" style={{ color: "var(--foreground)" }} />
-              </div>
               {["home", "library"].map(p => (
                   <button key={p} onClick={() => { onNavigate(p); setMenuOpen(false); }} className="text-left py-2 text-sm" style={{ color: "var(--foreground)" }}>
                     {p === "home" ? "프롬프트 마켓" : "구매 내역"}
