@@ -20,7 +20,7 @@ public class PurchaseController {
     public ResponseEntity<PurchaseResponseDto> purchase(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody PurchaseRequestDto dto) {
-        PurchaseResponseDto response = purchaseService.purchase(userDetails.getUsername(), dto);
+        PurchaseResponseDto response = purchaseService.purchase(userDetails.getUsername(), dto.getPromptId());
         return ResponseEntity.ok(response);
     }
 }
