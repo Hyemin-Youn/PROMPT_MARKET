@@ -7,189 +7,139 @@ import { PromptDetailPage } from "./pages/PromptDetailPage.jsx";
 import { LibraryPage } from "./pages/LibraryPage.jsx";
 import { AuthModal } from "./components/auth/AuthModal.jsx";
 
-// 내부 컴포넌트에서 라우팅 훅(useNavigate 등)을 사용하기 위해 AppContent로 분리합니다.
 const AppContent = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  // 1. 로그인 상태를 로컬스토리지(JWT 토큰 기반 가정)와 연동
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return !!localStorage.getItem("token"); // 토큰 존재 여부로 초기값 설정
-  });
+    const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem("userEmail"));
+    const [userEmail, setUserEmail] = useState(() => localStorage.getItem("userEmail") || "");
+    const [authModal, setAuthModal] = useState(null);
+    const [purchasedPrompts, setPurchasedPrompts] = useState([]);
 
-  const [authModal, setAuthModal] = useState(null);
-  const [purchasedPrompts, setPurchasedPrompts] = useState([]);
+    useEffect(() => {
+        if (isLoggedIn) {
+            const savedPurchases = localStorage.getItem("purchasedPrompts");
+            if (savedPurchases) setPurchasedPrompts(JSON.parse(savedPurchases));
+        }
+    }, [isLoggedIn]);
 
-  // 2. 앱 로드 시 로컬스토리지에 토큰이 있다면 사용자 데이터나 구매 목록을 불러오는 로직 (예시)
-  useEffect(() => {
-    if (isLoggedIn) {
-      // 실제 프로젝트에서는 여기서 API를 호출해 구매 목록을 채워넣는 것이 좋습니다.
-      // 현재는 예시로 로컬스토리지나 빈 배열을 유지합니다.
-      const savedPurchases = localStorage.getItem("purchasedPrompts");
-      if (savedPurchases) {
-        setPurchasedPrompts(JSON.parse(savedPurchases));
-      }
-    }
-  }, [isLoggedIn]);
+    useEffect(() => {
+        if (purchasedPrompts.length > 0) {
+            localStorage.setItem("purchasedPrompts", JSON.stringify(purchasedPrompts));
+        }
+    }, [purchasedPrompts]);
 
-  // 구매 목록 변경 시 로컬스토리지에 저장 (새로고침 유지용)
-  useEffect(() => {
-    if (purchasedPrompts.length > 0) {
-      localStorage.setItem("purchasedPrompts", JSON.stringify(purchasedPrompts));
-    }
-  }, [purchasedPrompts]);
+    const handleProtectedNavigate = (path) => {
+        if (!isLoggedIn) { setAuthModal("login"); return; }
+        navigate(path);
+    };
 
-  // 네비게이션 가드 (인증이 필요한 페이지 접근 제어)
-  const handleProtectedNavigate = (path) => {
-    if (!isLoggedIn) {
-      setAuthModal("login");
-      return;
-    }
-    navigate(path);
-  };
+    const handlePurchase = (promptId) => {
+        if (!isLoggedIn) { setAuthModal("login"); return; }
+        setPurchasedPrompts((prev) => prev.includes(promptId) ? prev : [...prev, promptId]);
+        navigate("/library");
+    };
 
-  // 단건 구매 처리
-  const handlePurchase = (promptId) => {
-    if (!isLoggedIn) {
-      setAuthModal("login");
-      return;
-    }
-    setPurchasedPrompts((prev) => {
-      const updated = prev.includes(promptId) ? prev : [...prev, promptId];
-      return updated;
-    });
-    navigate("/library");
-  };
+    const handleAuthSuccess = (token, email) => {
+        localStorage.setItem("userEmail", email || "");
+        setIsLoggedIn(true);
+        setUserEmail(email || "");
+        setAuthModal(null);
+    };
 
-  const handleAuthSuccess = (token) => {
-    // 백엔드에서 받은 JWT 토큰을 로컬스토리지에 저장 (인증 성공 시 토큰을 넘겨준다고 가정)
-    localStorage.setItem("token", token || "mock-jwt-token");
-    setIsLoggedIn(true);
-    setAuthModal(null);
-  };
+    const handleLogout = async () => {
+        try {
+            await fetch("http://localhost:8080/api/users/logout", {
+                method: "POST",
+                credentials: "include",
+            });
+        } catch (e) {
+            console.error("로그아웃 에러:", e);
+        }
+        localStorage.removeItem("purchasedPrompts");
+        localStorage.removeItem("userEmail");
+        setIsLoggedIn(false);
+        setUserEmail("");
+        setPurchasedPrompts([]);
+        navigate("/");
+    };
 
-  const handleLogout = () => {
-    // 로컬스토리지 비우기 및 상태 초기화
-    localStorage.removeItem("token");
-    localStorage.removeItem("purchasedPrompts");
-    setIsLoggedIn(false);
-    setPurchasedPrompts([]);
-    navigate("/");
-  };
+    const showFooter = location.pathname === "/";
 
-  // 조건부 푸터 노출 (현재 경로가 메인('/')일 때만)
-  const showFooter = location.pathname === "/";
+    const libraryProps = {
+        purchasedPrompts,
+        onLogout: handleLogout,
+        onSelectPrompt: (id) => navigate(`/detail/${id}`),
+        userEmail,
+    };
 
-  return (
-      <div
-          className="min-h-screen flex flex-col"
-          style={{
-            background: "#0b0b12",
-            fontFamily: "'Inter', 'Pretendard', sans-serif",
-          }}
-      >
-        <Navbar
-            currentPage={location.pathname} // 현재 URL 경로를 전달
-            onNavigate={(path) => {
-              // 인증이 필요한 메뉴들 처리
-              if (["/library", "/profile", "/favorites", "/settings"].includes(path)) {
-                handleProtectedNavigate(path);
-              } else {
-                navigate(path);
-              }
-            }}
-            isLoggedIn={isLoggedIn}
-            purchaseCount={purchasedPrompts.length}
-            onOpenLogin={() => setAuthModal("login")}
-            onOpenSignup={() => setAuthModal("signup")}
-            onLogout={handleLogout}
-        />
-
-        <main className="flex-1">
-          <Routes>
-            {/* 메인 페이지 */}
-            <Route
-                path="/"
-                element={
-                  <HomePage
-                      onSelectPrompt={(id) => navigate(`/detail/${id}`)}
-                      purchasedPrompts={purchasedPrompts}
-                  />
-                }
-            />
-
-            {/* 상세 페이지 (동적 파라미터 :id 사용) */}
-            <Route
-                path="/detail/:id"
-                element={
-                  <PromptDetailPageWrapper
-                      onPurchase={handlePurchase}
-                      isLoggedIn={isLoggedIn}
-                      purchasedPrompts={purchasedPrompts}
-                  />
-                }
-            />
-
-            {/* 라이브러리 및 마이페이지 계열 (인증 가드 적용) */}
-            {["/library", "/profile", "/favorites", "/settings"].map((path) => (
-                <Route
-                    key={path}
-                    path={path}
-                    element={
-                      isLoggedIn ? (
-                          <LibraryPage
-                              purchasedPrompts={purchasedPrompts}
-                              onLogout={handleLogout}
-                              onSelectPrompt={(id) => navigate(`/detail/${id}`)}
-                          />
-                      ) : (
-                          <Navigate to="/" replace />
-                      )
+    return (
+        <div className="min-h-screen flex flex-col" style={{ background: "#0b0b12", fontFamily: "'Inter', 'Pretendard', sans-serif" }}>
+            <Navbar
+                currentPage={location.pathname}
+                onNavigate={(path) => {
+                    if (["/library", "/profile", "/favorites", "/settings"].includes(path)) {
+                        handleProtectedNavigate(path);
+                    } else {
+                        navigate(path);
                     }
-                />
-            ))}
-
-            {/* 잘못된 경로 접근 시 홈으로 리다이렉트 */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-
-        {showFooter && <Footer />}
-
-        {authModal && (
-            <AuthModal
-                mode={authModal}
-                onClose={() => setAuthModal(null)}
-                onSuccess={handleAuthSuccess} // 여기에 토큰을 인자로 전달해야 합니다.
-                onSwitchMode={setAuthModal}
+                }}
+                isLoggedIn={isLoggedIn}
+                purchaseCount={purchasedPrompts.length}
+                onOpenLogin={() => setAuthModal("login")}
+                onOpenSignup={() => setAuthModal("signup")}
+                onLogout={handleLogout}
+                userEmail={userEmail}
             />
-        )}
-      </div>
-  );
+
+            <main className="flex-1">
+                <Routes>
+                    <Route path="/" element={<HomePage onSelectPrompt={(id) => navigate(`/detail/${id}`)} purchasedPrompts={purchasedPrompts} />} />
+                    <Route path="/detail/:id" element={<PromptDetailPageWrapper onPurchase={handlePurchase} isLoggedIn={isLoggedIn} purchasedPrompts={purchasedPrompts} />} />
+
+                    <Route path="/library"   element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="purchases" /> : <Navigate to="/" replace />} />
+                    <Route path="/profile"   element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="profile"   /> : <Navigate to="/" replace />} />
+                    <Route path="/favorites" element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="favorites" /> : <Navigate to="/" replace />} />
+                    <Route path="/settings"  element={isLoggedIn ? <LibraryPage {...libraryProps} initialNav="settings"  /> : <Navigate to="/" replace />} />
+
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+            </main>
+
+            {showFooter && <Footer />}
+
+            {authModal && (
+                <AuthModal
+                    mode={authModal}
+                    onClose={() => setAuthModal(null)}
+                    onSuccess={handleAuthSuccess}
+                    onSwitchMode={setAuthModal}
+                />
+            )}
+        </div>
+    );
 };
 
 const PromptDetailPageWrapper = ({ onPurchase, isLoggedIn, purchasedPrompts }) => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
-  return (
-      <PromptDetailPage
-          promptId={id}
-          onBack={() => navigate(-1)} // 이전 페이지로 이동
-          onPurchase={onPurchase}
-          isLoggedIn={isLoggedIn}
-          isPurchased={purchasedPrompts.includes(id)}
-      />
-  );
+    const { id } = useParams();
+    const navigate = useNavigate();
+    return (
+        <PromptDetailPage
+            promptId={id}
+            onBack={() => navigate(-1)}
+            onPurchase={onPurchase}
+            isLoggedIn={isLoggedIn}
+            isPurchased={purchasedPrompts.includes(id)}
+        />
+    );
 };
 
-// 최상위 App 컴포넌트에서 Router로 감싸줍니다.
 const App = () => {
-  return (
-      <Router>
-        <AppContent />
-      </Router>
-  );
+    return (
+        <Router>
+            <AppContent />
+        </Router>
+    );
 };
 
 export default App;

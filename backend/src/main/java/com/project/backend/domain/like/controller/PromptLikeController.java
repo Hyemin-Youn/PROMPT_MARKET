@@ -45,4 +45,17 @@ public class PromptLikeController {
 
         return ResponseEntity.ok(ApiResponse.success(likedPrompts));
     }
+
+
+    // '찜하기' 해놓은 게시글인지 아닌지 확인
+    @GetMapping("/{promptId}/is-liked")
+    public ResponseEntity<ApiResponse<Boolean>> checkIsLiked(
+            @PathVariable Long promptId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+        boolean isLiked = promptLikeService.isLiked(promptId, email);
+
+        return ResponseEntity.ok(ApiResponse.success(isLiked));
+    }
 }
