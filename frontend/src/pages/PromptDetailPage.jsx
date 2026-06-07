@@ -23,6 +23,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
   const [reportMeta, setReportMeta] = useState({ id: null, type: null });
   const [reportData, setReportData] = useState({ reason: "SPAM", detail: "" });
 
+
   const ratings = ["전체", "5점", "4점", "3점", "2점", "1점"];
   const PRICE = 15000;
 
@@ -47,11 +48,6 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
       console.error("백엔드 연결 에러:", error);
     }
   };
-
-  useEffect(() => {
-    fetchComments();
-  }, [promptId]);
-
 
 
   // 댓글 생성
@@ -125,6 +121,51 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
       console.error("신고 에러:", error);
     }
   };
+
+  // '찜하기' 여부 확인 메서드
+  const checkLikeStatus = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/prompts/${promptId}/is-liked`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const result = await response.json();
+      if (result.success) setLiked(result.data);
+    } catch (error) {
+      console.error("찜 상태 확인 실패:", error);
+    }
+  };
+
+  // '찜하기' 토글 함수
+  const handleToggleLike = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/prompts/${promptId}/likes`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        setLiked(!liked);
+      }
+    } catch (error) {
+      console.error("찜하기 실패:", error);
+    }
+  };
+
+  // 상세 페이지 진입시 댓글 목록 불러오기 & 찜하기 여부 체크
+  useEffect(() => {
+    fetchComments();
+    checkLikeStatus();
+  }, [promptId]);
+
 
 
   return (
@@ -288,7 +329,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
                   </form>
                 </div>
 
-                {/* 백엔드 DB에서 받아온 데이터 목록 바인딩 */}
+                {/* 백엔드 DB에서 받아온 댓글 목록 바인딩 */}
                 {reviews.length === 0 ? (
                     <div className="text-center py-8 text-sm" style={{ color: "var(--muted-foreground)" }}>
                       등록된 리뷰가 없습니다.
@@ -361,9 +402,18 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
                 )}
 
                 <div className="flex gap-2">
-                  <button onClick={() => setLiked(!liked)} className="flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-white/5"
-                    style={{ border: "1px solid var(--border-md)", color: liked ? "var(--destructive)" : "var(--muted-foreground)" }}>
-                    <Heart size={14} fill={liked ? "var(--destructive)" : "none"} /> 찜
+                  <button
+                      onClick={handleToggleLike}
+                      className="flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-white/5"
+                      style={{
+                        border: "1px solid var(--border-md)",
+                        color: liked ? "var(--destructive)" : "var(--muted-foreground)"
+                      }}
+                  >
+                    <Heart
+                        size={14}
+                        fill={liked ? "var(--destructive)" : "none"}
+                    /> 찜
                   </button>
                   <button onClick={() => openReportModal(promptId || 1, "PROMPT")} className="flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 text-sm" style={{ border: "1px solid var(--border-md)" }}>
                     <ShieldAlert size={14} /> 게시글 신고

@@ -66,4 +66,13 @@ public class PromptLikeService {
                 .map(PromptLikeResponseDto::new)
                 .toList();
     }
+
+
+    // 사용자의 '찜하기' 여부 확인
+    public boolean isLiked(Long promptId, String email) {
+        PromptUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return promptLikeRepository.existsByUserIdAndPromptPromptId(user.getId(), promptId);
+    }
 }
