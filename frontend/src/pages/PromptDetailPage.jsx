@@ -254,7 +254,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
                       </div>
                       <div className="p-4" style={{ background: "var(--sidebar)" }}>
                     <pre className="text-sm font-mono overflow-x-auto" style={{ color: "var(--accent)" }}>
-                      {promptData.sampleCode || "// 등록된 결과물 샘플이 없습니다."}
+                      {promptData.preview || "// 등록된 결과물 샘플이 없습니다."}
                     </pre>
                       </div>
                       <div className="px-4 py-3" style={{ background: "var(--card)" }}>
