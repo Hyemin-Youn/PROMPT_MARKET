@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Star, Download, Heart, Share2, Lock, Code2, ChevronLeft, ShoppingCart, CheckCircle2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Star, Download, Heart, Share2, Lock, Code2, ChevronLeft, ShoppingCart, CheckCircle2, ShieldAlert } from "lucide-react";
 
 const SAMPLE_CODE = `GET /api/v1/users/{id}\nResponse: { "id": 1, "name": "홍길동", "email": "user@example.com" }`;
 
@@ -10,22 +10,196 @@ const GUIDE_STEPS = [
   "실제 코드에 적용",
 ];
 
-const REVIEWS = [
-  { name: "박백엔드", rating: 5, date: "2025-05-12", text: "실무에서 바로 써먹을 수 있는 프롬프트입니다. API 설계 시간이 확실히 줄었어요." },
-  { name: "김스프링", rating: 5, date: "2025-05-08", text: "구성이 체계적이고 결과물 품질이 높습니다. 다음 버전도 기대됩니다." },
-  { name: "이리액트", rating: 4, date: "2025-04-30", text: "구매하고 바로 적용했는데 정말 유용해요. 팀 전체에 공유했습니다." },
-];
-
 export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isPurchased }) => {
   const [activeTab, setActiveTab] = useState("샘플");
   const [liked, setLiked] = useState(false);
   const [activeRating, setActiveRating] = useState("전체");
 
+  const [reviews, setReviews] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportMeta, setReportMeta] = useState({ id: null, type: null });
+  const [reportData, setReportData] = useState({ reason: "SPAM", detail: "" });
+
+
   const ratings = ["전체", "5점", "4점", "3점", "2점", "1점"];
   const PRICE = 15000;
 
+
+  // 댓글 목록 불러오기
+  const fetchComments = async () => {
+    try {
+      const currentPromptId = promptId;
+      const response = await fetch(`http://localhost:8080/api/prompts/${currentPromptId}/comments`);
+
+      if (response.ok) {
+        const jsonResponse = await response.json();
+        if (jsonResponse && jsonResponse.data) {
+          setReviews(jsonResponse.data);
+        } else {
+          setReviews([]);
+        }
+      } else {
+        console.error("댓글 목록을 불러오는 데 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("백엔드 연결 에러:", error);
+    }
+  };
+
+
+  // 댓글 생성
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
+    setLoading(true);
+    try {
+      const currentPromptId = promptId;
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(`http://localhost:8080/api/prompts/${currentPromptId}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          content: newComment
+        }),
+      });
+
+      if (response.ok) {
+        setNewComment("");
+        fetchComments();
+        alert("댓글이 등록되었습니다!");
+      } else {
+        alert("댓글 등록 실패");
+      }
+    } catch (error) {
+      console.error("통신 에러:", error);
+      alert("백엔드 서버와 통신할 수 없습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 신고 모달 열기
+  const openReportModal = (id, type) => {
+    setReportMeta({ id, type });
+    setIsReportModalOpen(true);
+  };
+
+  // 신고 제출 API 호출
+  const handleReportSubmit = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/api/reports`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          targetId: reportMeta.id,
+          reportTargetType: reportMeta.type,
+          reason: reportData.reason,
+          detail: reportData.detail
+        }),
+      });
+
+      if (response.ok) {
+        alert("신고가 정상적으로 접수되었습니다.");
+        setIsReportModalOpen(false);
+        setReportData({ reason: "SPAM", detail: "" });
+      } else {
+        alert("신고 처리에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("신고 에러:", error);
+    }
+  };
+
+  // '찜하기' 여부 확인 메서드
+  const checkLikeStatus = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/prompts/${promptId}/is-liked`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const result = await response.json();
+      if (result.success) setLiked(result.data);
+    } catch (error) {
+      console.error("찜 상태 확인 실패:", error);
+    }
+  };
+
+  // '찜하기' 토글 함수
+  const handleToggleLike = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/prompts/${promptId}/likes`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        setLiked(!liked);
+      }
+    } catch (error) {
+      console.error("찜하기 실패:", error);
+    }
+  };
+
+  // 상세 페이지 진입시 댓글 목록 불러오기 & 찜하기 여부 체크
+  useEffect(() => {
+    fetchComments();
+    checkLikeStatus();
+  }, [promptId]);
+
+
+
   return (
     <div className="min-h-screen pb-16" style={{ background: "var(--background)" }}>
+      {isReportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white p-6 rounded-2xl w-full max-w-sm shadow-xl">
+            <h3 className="font-bold text-lg mb-4 text-gray-900">신고하기 ({reportMeta.type})</h3>
+            <select
+              className="w-full mb-3 p-2 border rounded-lg text-gray-900 bg-white"
+              value={reportData.reason}
+              onChange={(e) => setReportData({...reportData, reason: e.target.value})}>
+              <option value="SPAM">스팸/광고</option>
+              <option value="ABUSE">욕설/비방</option>
+              <option value="COPYRIGHT">저작권 침해</option>
+              <option value="ETC">기타 사유</option>
+            </select>
+            <textarea
+              className="w-full p-2 border rounded-lg mb-4 h-24 text-gray-900 bg-white"
+              placeholder="상세 내용을 입력하세요."
+              value={reportData.detail}
+              onChange={(e) => setReportData({...reportData, detail: e.target.value})} />
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsReportModalOpen(false)}
+                className="flex-1 py-2 bg-gray-100 rounded-lg text-sm text-gray-900">취소</button>
+              <button
+                onClick={handleReportSubmit}
+                className="flex-1 py-2 bg-red-600 text-white rounded-lg text-sm">제출하기</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 pt-6">
         <button onClick={onBack} className="flex items-center gap-1 text-sm mb-6 hover:opacity-80 transition-opacity" style={{ color: "var(--muted-foreground)" }}>
           <ChevronLeft size={16} /> 마켓으로 돌아가기
@@ -131,7 +305,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
               <div className="space-y-4">
                 <div className="rounded-xl p-4" style={{ background: "var(--card)", border: "1px solid var(--border-sm)" }}>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="font-medium" style={{ color: "var(--foreground)" }}>128개 리뷰</span>
+                    <span className="font-medium" style={{ color: "var(--foreground)" }}>{reviews.length}개 리뷰</span>
                     <span className="flex items-center gap-1 font-semibold" style={{ color: "var(--brand-gold)" }}>
                       <Star size={14} fill="var(--brand-gold)" /> 4.9
                     </span>
@@ -144,24 +318,53 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
                       </button>
                     ))}
                   </div>
+
+                  {/* 백엔드 연결 댓글 폼 */}
+                  <form onSubmit={handleCommentSubmit} className="mt-4 flex gap-2">
+                    <input
+                      type="text"
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="리뷰 내용을 입력하세요."
+                      className="flex-1 px-4 py-2 rounded-lg text-sm bg-transparent"
+                      style={{ border: "1px solid var(--border-md)", color: "var(--foreground)" }}
+                      disabled={loading}
+                    />
+                    <button type="submit" disabled={loading}
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90 shrink-0"
+                      style={{ background: "var(--primary)" }}>
+                      {loading ? "등록 중..." : "등록"}
+                    </button>
+                  </form>
                 </div>
-                {REVIEWS.map((review, i) => (
-                  <div key={i} className="rounded-xl p-4 space-y-2" style={{ background: "var(--card)", border: "1px solid var(--border-xs)" }}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white" style={{ background: "var(--primary)" }}>{review.name[0]}</div>
-                      <div>
-                        <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>{review.name}</p>
-                        <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{review.date}</p>
-                      </div>
-                      <div className="ml-auto flex gap-0.5">
-                        {Array.from({ length: 5 }).map((_, si) => (
-                          <Star key={si} size={12} fill={si < review.rating ? "var(--brand-gold)" : "none"} style={{ color: "var(--brand-gold)" }} />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-sm" style={{ color: "var(--secondary-foreground)" }}>{review.text}</p>
+
+                {/* 백엔드 DB에서 받아온 댓글 목록 바인딩 */}
+                {reviews.length === 0 ? (
+                  <div className="text-center py-8 text-sm" style={{ color: "var(--muted-foreground)" }}>
+                    등록된 리뷰가 없습니다.
                   </div>
-                ))}
+                ) : (
+                  reviews.map((review, i) => (
+                    <div key={review.id || i} className="rounded-xl p-4 space-y-2" style={{ background: "var(--card)", border: "1px solid var(--border-xs)" }}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white" style={{ background: "var(--primary)" }}>
+                          {(review.username || "U")[0]}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>{review.username || "테스트유저"}</p>
+                          <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{review.createdAt ? review.createdAt.split('T')[0] : "방금 전"}</p>
+                        </div>
+                        <button onClick={() => openReportModal(review.id, "COMMENT")} className="ml-auto text-xs text-red-500 hover:underline">신고하기</button>
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: 5 }).map((_, si) => (
+                            <Star key={si} size={12} fill={si < (review.rating || 5) ? "var(--brand-gold)" : "none"} style={{ color: "var(--brand-gold)" }} />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-sm" style={{ color: "var(--secondary-foreground)" }}>{review.content}</p>
+                    </div>
+                  ))
+                )}
               </div>
             )}
           </div>
@@ -179,7 +382,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
                     ))}
                   </div>
                   <span className="text-sm font-medium" style={{ color: "var(--brand-gold)" }}>4.9</span>
-                  <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>(128개 리뷰)</span>
+                  <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>({reviews.length}개 리뷰)</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white" style={{ background: "var(--primary)" }}>김</div>
@@ -208,12 +411,21 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
                 )}
 
                 <div className="flex gap-2">
-                  <button onClick={() => setLiked(!liked)} className="flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-white/5"
-                    style={{ border: "1px solid var(--border-md)", color: liked ? "var(--destructive)" : "var(--muted-foreground)" }}>
-                    <Heart size={14} fill={liked ? "var(--destructive)" : "none"} /> 찜
+                  <button
+                      onClick={handleToggleLike}
+                      className="flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-white/5"
+                      style={{
+                        border: "1px solid var(--border-md)",
+                        color: liked ? "var(--destructive)" : "var(--muted-foreground)"
+                      }}
+                  >
+                    <Heart
+                        size={14}
+                        fill={liked ? "var(--destructive)" : "none"}
+                    /> 찜
                   </button>
-                  <button className="flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-white/5" style={{ border: "1px solid var(--border-md)", color: "var(--muted-foreground)" }}>
-                    <Share2 size={14} /> 공유
+                  <button onClick={() => openReportModal(promptId || 1, "PROMPT")} className="flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 text-sm" style={{ border: "1px solid var(--border-md)" }}>
+                    <ShieldAlert size={14} /> 게시글 신고
                   </button>
                 </div>
 

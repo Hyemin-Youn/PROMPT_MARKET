@@ -4,6 +4,7 @@ import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -53,4 +54,51 @@ public class Prompt extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PromptStatus status;
+
+    @Builder
+    public Prompt(PromptUser user, String title, String content, String preview,
+                  String thumbnailUrl, int price, PromptCategory category, AiType aiType) {
+        this.user = user;
+        this.title = title;
+        this.content = content;
+        this.preview = preview;
+        this.thumbnailUrl = thumbnailUrl;
+        this.price = price;
+        this.category = category;
+        this.aiType = aiType;
+    }
+
+    @PrePersist
+    public void onCreate() {
+        this.status = PromptStatus.ACTIVE;
+        this.rating = 0;
+        this.viewCount = 0;
+    }
+
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+
+    public void update(String title, String content, String preview, String thumbnailUrl,
+                       int price, PromptCategory category, AiType aiType) {
+        this.title = title;
+        this.content = content;
+        this.preview = preview;
+        this.thumbnailUrl = thumbnailUrl;
+        this.price = price;
+        this.category = category;
+        this.aiType = aiType;
+    }
+
+    public void hide() {
+        this.status = PromptStatus.HIDDEN;
+    }
+
+    public void delete() {
+        this.status = PromptStatus.DELETED;
+    }
+
+    public boolean isOwner(Long userId) {
+        return this.user.getId().equals(userId);
+    }
 }

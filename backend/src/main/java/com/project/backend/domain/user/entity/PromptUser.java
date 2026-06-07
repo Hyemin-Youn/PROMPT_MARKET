@@ -58,6 +58,12 @@ public class PromptUser extends BaseEntity {
     }
 
 
+    // 신고당한 계정 상태 변경 (관리자용)
+    public void updateStatus(Status status) {
+        this.status = status;
+    }
+
+
     public enum Role { USER, ADMIN }
 
     public enum Status { ACTIVE, SUSPENDED, DELETED }
