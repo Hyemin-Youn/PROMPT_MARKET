@@ -17,22 +17,20 @@ export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEm
     const [copied, setCopied] = useState(false);
     const [selectedExample, setSelectedExample] = useState(null);
 
-    // 🌟 백엔드에서 받아올 실제 구매한 프롬프트 목록 상태
     const [purchasedList, setPurchasedList] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // 🌟 쿠키 기반 인증을 통한 구매 내역 데이터 패치 함수
     const fetchPurchasedLibrary = async () => {
         setLoading(true);
         try {
-            const response = await fetch("http://localhost:8080/api/library/purchases", {
+            const response = await fetch("http://localhost:8080/api/purchases", {
                 method: "GET",
-                credentials: "include" // 세션/쿠키 기반 인증 연동
+                credentials: "include"
             });
             if (response.ok) {
                 const jsonResponse = await response.json();
-                // 백엔드 응답 포맷 규격에 맞게 데이터 세팅 (예: jsonResponse.data)
-                setPurchasedList(jsonResponse.data || jsonResponse || []);
+                const data = jsonResponse.data || jsonResponse;
+                setPurchasedList(Array.isArray(data) ? data : []);
             } else {
                 console.error("구매 내역 로드 실패");
             }
@@ -43,15 +41,12 @@ export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEm
         }
     };
 
-    // 라이브러리 진입 시 구매 내역 자동 조회
     useEffect(() => {
         fetchPurchasedLibrary();
     }, []);
 
-    // 현재 선택된 프롬프트 데이터 객체 추출
     const currentPrompt = purchasedList[activePrompt] || null;
 
-    // 프롬프트 내 [변수] 컴포넌트 하이라이트 함수
     const highlightVars = (text) => {
         if (!text) return "";
         return text.split(/(\[[A-Z_]+\])/g).map((part, i) =>
@@ -61,7 +56,6 @@ export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEm
         );
     };
 
-    // 클립보드 복사 핸들러 (동적 데이터 반영)
     const handleCopy = () => {
         if (!currentPrompt || !currentPrompt.promptTemplate) return;
         navigator.clipboard.writeText(currentPrompt.promptTemplate);
@@ -118,24 +112,24 @@ export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEm
                             </div>
                         ) : (
                             <>
-                                {/* 구매 목록 루프 */}
                                 <div className="space-y-3 mb-8">
                                     {purchasedList.map((item, i) => (
-                                        <button key={item.id || i} onClick={() => { setActivePrompt(i); setSelectedExample(null); }} className="w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all"
+                                        <button key={item.purchaseId || i} onClick={() => { setActivePrompt(i); setSelectedExample(null); }} className="w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all"
                                                 style={{ background: "var(--card)", border: `1px solid ${activePrompt === i ? "var(--border-2xl)" : "var(--border-sm)"}`, boxShadow: activePrompt === i ? "0 0 15px var(--primary-bg-md)" : "none" }}>
                                             <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--secondary)" }}>
                                                 <Download size={16} style={{ color: "var(--brand-violet-light)" }} />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium truncate" style={{ color: "var(--foreground)" }}>{item.title}</p>
-                                                <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{item.category} · {item.purchasedAt ? item.purchasedAt.split('T')[0] : "이용 중"}</p>
+                                                <p className="text-sm font-medium truncate" style={{ color: "var(--foreground)" }}>{item.promptTitle}</p>
+                                                <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+                                                    {item.paidPrice ? `${item.paidPrice.toLocaleString()}원` : "구매완료"} · {item.purchasedAt ? item.purchasedAt.split('T')[0] : "이용 중"}
+                                                </p>
                                             </div>
                                             <ChevronRight size={14} style={{ color: "var(--muted-foreground)" }} />
                                         </button>
                                     ))}
                                 </div>
 
-                                {/* 동적 프롬프트 원본 템플릿 상세 출력 */}
                                 {currentPrompt && (
                                     <>
                                         <div className="rounded-xl overflow-hidden mb-4" style={{ border: "1px solid var(--border-md)" }}>
@@ -164,7 +158,6 @@ export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEm
                                             </div>
                                         </div>
 
-                                        {/* 동적 예시(Example prompts) 출력 영역 */}
                                         <div className="rounded-xl overflow-hidden mb-4" style={{ border: "1px solid var(--border-sm)" }}>
                                             <div className="px-4 py-3" style={{ background: "var(--card)", borderBottom: "1px solid var(--border-xs)" }}>
                                                 <span className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Example prompts</span>
@@ -197,7 +190,6 @@ export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEm
                                             </div>
                                         </div>
 
-                                        {/* 동적 주의사항/팁(Prompt instructions) 출력 영역 */}
                                         <div className="rounded-xl overflow-hidden" style={{ border: "1px solid var(--border-sm)" }}>
                                             <div className="px-4 py-3" style={{ background: "var(--card)", borderBottom: "1px solid var(--border-xs)" }}>
                                                 <span className="text-sm font-medium" style={{ color: "var(--foreground)" }}>Prompt instructions</span>
