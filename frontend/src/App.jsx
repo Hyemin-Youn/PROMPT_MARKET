@@ -11,7 +11,7 @@ const AppContent = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem("token"));
+    const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem("userEmail"));
     const [userEmail, setUserEmail] = useState(() => localStorage.getItem("userEmail") || "");
     const [authModal, setAuthModal] = useState(null);
     const [purchasedPrompts, setPurchasedPrompts] = useState([]);
@@ -41,15 +41,21 @@ const AppContent = () => {
     };
 
     const handleAuthSuccess = (token, email) => {
-        localStorage.setItem("token", token || "mock-jwt-token");
         localStorage.setItem("userEmail", email || "");
         setIsLoggedIn(true);
         setUserEmail(email || "");
         setAuthModal(null);
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
+    const handleLogout = async () => {
+        try {
+            await fetch("http://localhost:8080/api/users/logout", {
+                method: "POST",
+                credentials: "include",
+            });
+        } catch (e) {
+            console.error("로그아웃 에러:", e);
+        }
         localStorage.removeItem("purchasedPrompts");
         localStorage.removeItem("userEmail");
         setIsLoggedIn(false);
