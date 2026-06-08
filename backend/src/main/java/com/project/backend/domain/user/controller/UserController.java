@@ -32,7 +32,9 @@ public class UserController {
     public ResponseEntity<ApiResponse<Map<String, String>>> getMe(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        return ResponseEntity.ok(ApiResponse.success(Map.of("email", userDetails.getUsername())));
+        String email = userDetails.getUsername();
+        String nickname = userService.getNickname(email);
+        return ResponseEntity.ok(ApiResponse.success(Map.of("email", email, "nickname", nickname)));
     }
 
 

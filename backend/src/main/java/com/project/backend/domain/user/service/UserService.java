@@ -70,6 +70,12 @@ public class UserService {
         return new TokenResponseDto(accessToken, refreshToken);
     }
 
+    public String getNickname(String email) {
+        return userRepository.findByEmail(email)
+                .map(PromptUser::getNickname)
+                .orElse("");
+    }
+
     @Transactional
     public void updateProfile(String email, String nickname) {
         PromptUser user = userRepository.findByEmail(email)
