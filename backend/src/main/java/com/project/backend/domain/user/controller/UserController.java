@@ -58,6 +58,7 @@ public class UserController {
             HttpServletResponse response,
             @AuthenticationPrincipal UserDetails userDetails) {
 
+        // ✅ null 체크 추가
         if (userDetails == null) {
             return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
         }
@@ -73,19 +74,20 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("로그아웃 성공"));
     }
 
+    // ✅ 없는 엔드포인트 추가
     @GetMapping("/my-prompts")
     public ResponseEntity<ApiResponse<List<Object>>> getMyPrompts(
             @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
-        }
+        
         return ResponseEntity.ok(ApiResponse.success(List.of()));
     }
 
     @GetMapping("/activity")
-    public ResponseEntity<ApiResponse<List<Object>>> getActivity() {
-
-        return ResponseEntity.ok(ApiResponse.success(List.of())); // ✅ Map.of() → List.of()
+    public ResponseEntity<ApiResponse<List<Object>>> getActivity(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        
+        return ResponseEntity.ok(ApiResponse.success(List.of()));
+    
     }
 
     @PutMapping("/profile")
