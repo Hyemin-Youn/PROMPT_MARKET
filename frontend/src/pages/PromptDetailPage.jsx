@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Star, Download, Heart, Code2, ChevronLeft, ShoppingCart, CheckCircle2, ShieldAlert, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getPrompt, getComments, postComment, checkIsLiked, toggleLike, deletePrompt, submitReport } from "../api/prompts.js";
 
 export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isPurchased }) => {
   const [activeTab, setActiveTab] = useState("샘플");
@@ -55,21 +56,12 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
   };
 
   const fetchComments = async () => {
-    if (!promptId) return; // ✅ 가드 추가
+    if (!promptId) return;
     try {
-      const response = await fetch(`http://localhost:8080/api/prompts/${promptId}/comments`);
-      if (response.ok) {
-        const jsonResponse = await response.json();
-        if (jsonResponse && jsonResponse.data) {
-          setReviews(jsonResponse.data);
-        } else {
-          setReviews([]);
-        }
-      } else {
-        console.error("댓글 목록을 불러오는 데 실패했습니다.");
-      }
+      const res = await getComments(promptId);
+      setReviews(res.data?.data || []);
     } catch (error) {
-      console.error("백엔드 연결 에러:", error);
+      console.error("댓글 목록 로드 에러:", error);
     }
   };
 
@@ -79,23 +71,13 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/prompts/${promptId}/comments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ content: newComment }),
-      });
-
-      if (response.ok) {
-        setNewComment("");
-        fetchComments();
-        alert("댓글이 등록되었습니다!");
-      } else {
-        alert("댓글 등록 실패");
-      }
+      await postComment(promptId, newComment);
+      setNewComment("");
+      fetchComments();
+      alert("댓글이 등록되었습니다!");
     } catch (error) {
-      console.error("통신 에러:", error);
-      alert("백엔드 서버와 통신할 수 없습니다.");
+      console.error("댓글 등록 에러:", error);
+      alert("댓글 등록에 실패했습니다.");
     } finally {
       setLoading(false);
     }
@@ -108,41 +90,26 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
 
   const handleReportSubmit = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/reports`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          targetId: reportMeta.id,
-          reportTargetType: reportMeta.type,
-          reason: reportData.reason,
-          detail: reportData.detail
-        }),
+      await submitReport({
+        targetId:         reportMeta.id,
+        reportTargetType: reportMeta.type,
+        reason:           reportData.reason,
+        detail:           reportData.detail,
       });
-
-      if (response.ok) {
-        alert("신고가 정상적으로 접수되었습니다.");
-        setIsReportModalOpen(false);
-        setReportData({ reason: "SPAM", detail: "" });
-      } else {
-        alert("신고 처리에 실패했습니다.");
-      }
+      alert("신고가 정상적으로 접수되었습니다.");
+      setIsReportModalOpen(false);
+      setReportData({ reason: "SPAM", detail: "" });
     } catch (error) {
       console.error("신고 에러:", error);
+      alert("신고 처리에 실패했습니다.");
     }
   };
 
   const checkLikeStatus = async () => {
-    if (!promptId) return; // ✅ 가드 추가
+    if (!promptId) return;
     try {
-      const response = await fetch(`http://localhost:8080/api/prompts/${promptId}/is-liked`, {
-        method: "GET",
-        credentials: "include"
-      });
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) setLiked(result.data);
-      }
+      const res = await checkIsLiked(promptId);
+      if (res.data?.success) setLiked(res.data.data);
     } catch (error) {
       console.error("찜 상태 확인 실패:", error);
     }
@@ -154,13 +121,8 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
       return;
     }
     try {
-      const response = await fetch(`http://localhost:8080/api/prompts/${promptId}/likes`, {
-        method: "POST",
-        credentials: "include"
-      });
-      if (response.ok) {
-        setLiked(!liked);
-      }
+      await toggleLike(promptId);
+      setLiked(prev => !prev);
     } catch (error) {
       console.error("찜하기 실패:", error);
     }
@@ -169,16 +131,12 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
   const handleDelete = async () => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
     try {
-      const response = await fetch(`http://localhost:8080/api/prompts/${promptId}?userId=1`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (!response.ok) { alert("삭제 실패"); return; }
+      await deletePrompt(promptId);
       alert("삭제되었습니다.");
       navigate("/");
     } catch (error) {
       console.error(error);
-      alert("서버와 통신할 수 없습니다.");
+      alert("삭제에 실패했습니다.");
     }
   };
 

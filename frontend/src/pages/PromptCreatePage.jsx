@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createPrompt } from "../api/prompts.js";
 
 export const PromptCreatePage = () => {
     const navigate = useNavigate();
@@ -27,27 +28,12 @@ export const PromptCreatePage = () => {
         e.preventDefault();
 
         try {
-            // userId는 백엔드에서 아직 JWT 연동 전이라 임시로 1 사용
-            const response = await fetch("http://localhost:8080/api/prompts?userId=1", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify(form),
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error("등록 실패:", errorText);
-                alert("프롬프트 등록에 실패했습니다.");
-                return;
-            }
-
+            await createPrompt(form);
             alert("프롬프트가 등록되었습니다.");
             navigate("/");
         } catch (error) {
             console.error("프롬프트 등록 에러:", error);
+            alert("프롬프트 등록에 실패했습니다.");
             alert("서버와 통신할 수 없습니다.");
         }
     };

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Star, Download, Edit2, Code2, CheckCircle2, TrendingUp, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getMyPrompts, getActivity, getFollowInfo } from "../api/users.js";
 
 export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
   const navigate = useNavigate();
@@ -15,23 +16,14 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const promptsRes = await fetch("http://localhost:8080/api/users/my-prompts", { credentials: "include" });
-        if (promptsRes.ok) {
-          const json = await promptsRes.json();
-          setMyPrompts(json.data || []); // ✅ .data 추출
-        }
-
-        const activityRes = await fetch("http://localhost:8080/api/users/activity", { credentials: "include" });
-        if (activityRes.ok) {
-          const json = await activityRes.json();
-          setActivities(json.data || []); // ✅ .data 추출
-        }
-
-        const followRes = await fetch("http://localhost:8080/api/users/follow-info", { credentials: "include" });
-        if (followRes.ok) {
-          const json = await followRes.json();
-          setFollowData(json.data || { followers: [], followings: [], counts: { followerCount: 0, followingCount: 0 } }); // ✅ .data 추출
-        }
+        const [promptsRes, activityRes, followRes] = await Promise.all([
+          getMyPrompts(),
+          getActivity(),
+          getFollowInfo(),
+        ]);
+        setMyPrompts(promptsRes.data?.data || []);
+        setActivities(activityRes.data?.data || []);
+        setFollowData(followRes.data?.data || { followers: [], followings: [], counts: { followerCount: 0, followingCount: 0 } });
       } catch (error) {
         console.error("프로필 정보 로드 실패:", error);
       }
