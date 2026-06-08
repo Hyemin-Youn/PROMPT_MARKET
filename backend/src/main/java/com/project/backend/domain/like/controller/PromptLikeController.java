@@ -23,10 +23,6 @@ public class PromptLikeController {
             @PathVariable Long promptId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // ✅ null 체크
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
-        }
 
         String email = userDetails.getUsername();
         boolean isLiked = promptLikeService.toggleLike(promptId, email);
@@ -39,10 +35,6 @@ public class PromptLikeController {
     public ResponseEntity<ApiResponse<List<PromptLikeResponseDto>>> getMyLikedPrompts(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // ✅ null 체크
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
-        }
 
         String email = userDetails.getUsername();
         List<PromptLikeResponseDto> likedPrompts = promptLikeService.getMyLikedPrompts(email);
@@ -55,10 +47,6 @@ public class PromptLikeController {
             @PathVariable Long promptId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // ✅ 비로그인 = 좋아요 안 한 상태로 처리 (401 대신 false 반환)
-        if (userDetails == null) {
-            return ResponseEntity.ok(ApiResponse.success(false));
-        }
 
         String email = userDetails.getUsername();
         boolean isLiked = promptLikeService.isLiked(promptId, email);

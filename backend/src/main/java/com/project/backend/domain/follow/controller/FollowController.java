@@ -26,10 +26,6 @@ public class FollowController {
             @PathVariable Long followingId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // ✅ null 체크
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
-        }
 
         String email = userDetails.getUsername();
         boolean isFollowed = followService.toggleFollow(followingId, email);
@@ -42,10 +38,6 @@ public class FollowController {
     public ResponseEntity<ApiResponse<List<FollowResponseDto>>> getMyFollowings(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // ✅ null 체크
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
-        }
 
         String email = userDetails.getUsername();
         List<FollowResponseDto> followings = followService.getFollowings(email);
@@ -57,10 +49,6 @@ public class FollowController {
     public ResponseEntity<ApiResponse<List<FollowResponseDto>>> getMyFollowers(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // ✅ null 체크
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
-        }
 
         String email = userDetails.getUsername();
         List<FollowResponseDto> followers = followService.getFollowers(email);
@@ -72,10 +60,6 @@ public class FollowController {
     public ResponseEntity<ApiResponse<FollowCountResponseDto>> getMyFollowCounts(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // ✅ null 체크
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
-        }
 
         String email = userDetails.getUsername();
         FollowCountResponseDto followCounts = followService.getFollowCounts(email);
@@ -87,10 +71,6 @@ public class FollowController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMyFollowInfo(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        // ✅ null 체크
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
-        }
 
         String email = userDetails.getUsername();
 
