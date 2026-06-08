@@ -1,12 +1,11 @@
 package com.project.backend.global.auth;
 
-import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.repository.UserRepository;
-import com.project.backend.global.exception.CustomException;
-import com.project.backend.global.exception.ErrorCode;
+import com.project.backend.domain.user.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
@@ -24,7 +23,11 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
-    private final RefreshTokenService refreshTokenService;  // 추가
+    private final RefreshTokenService refreshTokenService;
+    private final CustomOAuth2UserService customOAuth2UserService;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(
@@ -37,10 +40,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         String email = extractEmail(oAuth2User);
 
-        PromptUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        String role = authentication.getAuthorities().stream()
+                .findFirst()
+                .map(a -> a.getAuthority())
+                .orElse("USER");
 
-        String accessToken = jwtTokenProvider.generateToken(email, user.getRole().name());
+        String accessToken = jwtTokenProvider.generateToken(email, role);
         String refreshToken = jwtTokenProvider.generateRefreshToken(email);
 
         // Redis에 저장
@@ -64,7 +69,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-        response.sendRedirect("/oauth2/callback");
+
+        boolean isNew = customOAuth2UserService.consumeNewUserFlag(email);
+        String redirect = isNew
+                ? frontendUrl + "/oauth2/callback?setup=true"
+                : frontendUrl + "/oauth2/callback";
+        response.sendRedirect(redirect);
     }
 
     private String extractEmail(OAuth2User user) {

@@ -7,7 +7,12 @@ export const OAuthCallbackPage = ({ onLoginSuccess }) => {
 
   useEffect(() => {
     onLoginSuccess();
-    navigate("/", { replace: true });
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("setup") === "true") {
+      navigate("/oauth/setup", { replace: true });
+    } else {
+      navigate("/", { replace: true });
+    }
   }, []);
 
   return (

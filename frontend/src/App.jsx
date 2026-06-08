@@ -12,6 +12,7 @@ import { LibraryPage }         from "./pages/LibraryPage.jsx";
 import { LoginPage }           from "./pages/LoginPage.jsx";
 import { SignupPage }          from "./pages/SignupPage.jsx";
 import { OAuthCallbackPage }   from "./pages/OAuthCallbackPage.jsx";
+import { OAuthSetupPage }      from "./pages/OAuthSetupPage.jsx";
 import { logout as apiLogout } from "./api/auth.js";
 
 /* ─── 상세 페이지 래퍼 (useParams 사용) ─── */
@@ -148,6 +149,8 @@ const AppContent = () => {
           <Route path="/oauth2/callback" element={
             <OAuthCallbackPage onLoginSuccess={handleLoginSuccess} />
           } />
+          {/* OAuth 신규 유저 닉네임 설정 */}
+          <Route path="/oauth/setup" element={<OAuthSetupPage />} />
 
           {/* 로그인 필요 */}
           {["/library", "/profile", "/favorites", "/settings"].map((path) => (

@@ -57,18 +57,15 @@ public class PromptUser extends BaseEntity {
         return user;
     }
 
-
     // 신고당한 계정 상태 변경 (관리자용)
     public void updateStatus(Status status) {
         this.status = status;
     }
 
-
     // 프로필에서 닉네임 수정
     public void updateProfile(String nickname) {
         this.nickname = nickname;
     }
-
 
     public enum Role { USER, ADMIN }
 
