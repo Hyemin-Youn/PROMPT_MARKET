@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -31,28 +32,27 @@ public class UserController {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
 
-    // 현재 로그인 유저 정보 조회
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<Map<String, String>>> getMe(
             @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
+        }
         return ResponseEntity.ok(ApiResponse.success(Map.of("email", userDetails.getUsername())));
     }
 
-    // 1단계: 인증코드 발송
     @PostMapping("/send-code")
     public ResponseEntity<ApiResponse<Void>> sendCode(@Valid @RequestBody UserRequestDto.SignUpRequestDto dto) {
         userService.sendVerificationCode(dto);
         return ResponseEntity.ok(ApiResponse.success("인증 코드가 발송되었습니다."));
     }
 
-    // 2단계: 코드 검증
     @PostMapping("/verify-email")
     public ResponseEntity<ApiResponse<Void>> verifyEmail(@Valid @RequestBody EmailVerifyRequestDto dto) {
         userService.verifyEmail(dto);
         return ResponseEntity.ok(ApiResponse.success("이메일 인증이 완료되었습니다."));
     }
 
-    // 3단계: 가입 확정
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Void>> signup(@Valid @RequestBody UserRequestDto.SignUpRequestDto dto) {
         userService.signup(dto);
@@ -97,6 +97,10 @@ public class UserController {
             HttpServletRequest request, HttpServletResponse response,
             @AuthenticationPrincipal UserDetails userDetails) {
 
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
+        }
+
         refreshTokenService.deleteRefreshToken(userDetails.getUsername());
 
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", "").maxAge(0).path("/").build();
@@ -106,6 +110,24 @@ public class UserController {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         return ResponseEntity.ok(ApiResponse.success("로그아웃 성공"));
+    }
+
+    @GetMapping("/my-prompts")
+    public ResponseEntity<ApiResponse<List<Object>>> getMyPrompts(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
+        }
+        return ResponseEntity.ok(ApiResponse.success(List.of()));
+    }
+
+    @GetMapping("/activity")
+    public ResponseEntity<ApiResponse<List<Object>>> getActivity(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
+        }
+        return ResponseEntity.ok(ApiResponse.success(List.of())); // ✅ Map.of() → List.of()
     }
 
     private String extractCookie(HttpServletRequest request, String name) {

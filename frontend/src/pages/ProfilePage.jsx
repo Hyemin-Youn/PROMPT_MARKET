@@ -6,30 +6,32 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
 
-  // 백엔드 연동 상태 관리들
   const [myPrompts, setMyPrompts] = useState([]);
   const [activities, setActivities] = useState([]);
   const [followData, setFollowData] = useState({ followers: [], followings: [], counts: { followerCount: 0, followingCount: 0 } });
 
-  // 모달 상태 관리 (팔로워/팔로잉 목록 확인용)
-  const [activeFollowModal, setActiveFollowModal] = useState(null); // 'followers' | 'followings' | null
+  const [activeFollowModal, setActiveFollowModal] = useState(null);
 
-  // 백엔드 데이터 패치
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        // 1. 내 등록 프롬프트 목록 가져오기
         const promptsRes = await fetch("http://localhost:8080/api/users/my-prompts", { credentials: "include" });
-        if (promptsRes.ok) setMyPrompts(await promptsRes.json());
+        if (promptsRes.ok) {
+          const json = await promptsRes.json();
+          setMyPrompts(json.data || []); // ✅ .data 추출
+        }
 
-        // 2. 활동 내역 가져오기
         const activityRes = await fetch("http://localhost:8080/api/users/activity", { credentials: "include" });
-        if (activityRes.ok) setActivities(await activityRes.json());
+        if (activityRes.ok) {
+          const json = await activityRes.json();
+          setActivities(json.data || []); // ✅ .data 추출
+        }
 
-        // 3. 팔로우/팔로잉 데이터 가져오기
         const followRes = await fetch("http://localhost:8080/api/users/follow-info", { credentials: "include" });
-        if (followRes.ok) setFollowData(await followRes.json());
-
+        if (followRes.ok) {
+          const json = await followRes.json();
+          setFollowData(json.data || { followers: [], followings: [], counts: { followerCount: 0, followingCount: 0 } }); // ✅ .data 추출
+        }
       } catch (error) {
         console.error("프로필 정보 로드 실패:", error);
       }
@@ -45,7 +47,6 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
       <div className="min-h-screen pb-16" style={{ background: "var(--background)" }}>
         <div className="max-w-4xl mx-auto px-4 pt-8">
 
-          {/* 상단 프로필 카드 */}
           <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={{ background: "var(--card)", border: "1px solid var(--border-md)" }}>
             <div className="absolute top-0 right-0 w-48 h-48 opacity-10 rounded-full" style={{ background: "var(--gradient-hero)", transform: "translate(30%, -30%)" }} />
             <div className="flex flex-col sm:flex-row gap-5 items-start sm:items-center relative">
@@ -72,14 +73,13 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
                 <p className="text-sm mb-2" style={{ color: "var(--muted-foreground)" }}>{userEmail}</p>
                 <p className="text-sm mb-3" style={{ color: "var(--secondary-foreground)" }}>스타일 통합 담당 · Spring Boot / React 개발자</p>
 
-                {/* 🌟 [추가] 팔로워 & 팔로잉 카운터 래퍼 */}
                 <div className="flex items-center gap-4 text-sm mt-2 pt-2 border-t border-gray-800/40">
                   <button
                       onClick={() => setActiveFollowModal("followers")}
                       className="hover:text-purple-400 transition-colors text-left"
                       style={{ color: "var(--foreground)" }}
                   >
-                    팔로워 <span className="font-bold text-purple-400 ml-1">{followData.counts.followerCount}</span>
+                    팔로워 <span className="font-bold text-purple-400 ml-1">{followData.counts?.followerCount || 0}</span>
                   </button>
                   <span className="w-1 h-1 rounded-full bg-gray-700" />
                   <button
@@ -87,17 +87,15 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
                       className="hover:text-purple-400 transition-colors text-left"
                       style={{ color: "var(--foreground)" }}
                   >
-                    팔로잉 <span className="font-bold text-purple-400 ml-1">{followData.counts.followingCount}</span>
+                    팔로잉 <span className="font-bold text-purple-400 ml-1">{followData.counts?.followingCount || 0}</span>
                   </button>
                 </div>
-
               </div>
             </div>
 
-            {/* 통계 메트릭 */}
             <div className="grid grid-cols-3 gap-4 mt-6 pt-5" style={{ borderTop: "1px solid var(--border-xs)" }}>
               {[
-                { label: "등록 프롬프트", value: myPrompts.length,                 Icon: Code2,      color: "var(--brand-violet-light)" },
+                { label: "등록 프롬프트", value: myPrompts.length,                  Icon: Code2,      color: "var(--brand-violet-light)" },
                 { label: "총 다운로드",   value: totalDownloads,                     Icon: Download,   color: "var(--accent)" },
                 { label: "총 판매액",     value: `${totalSales.toLocaleString()}원`, Icon: TrendingUp, color: "var(--brand-gold)" },
               ].map(({ label, value, Icon, color }) => (
@@ -112,7 +110,6 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
             </div>
           </div>
 
-          {/* 탭 네비게이션 */}
           <div className="flex gap-1 p-1 rounded-lg mb-6" style={{ background: "var(--card)" }}>
             {["overview", "myprompts", "activity"].map(tab => (
                 <button key={tab} onClick={() => setActiveTab(tab)} className="flex-1 py-2 rounded-md text-sm transition-all"
@@ -122,7 +119,6 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
             ))}
           </div>
 
-          {/* 탭 콘텐츠 영역 */}
           {activeTab === "overview" && (
               <div className="space-y-4">
                 <div className="rounded-xl p-5" style={{ background: "var(--card)", border: "1px solid var(--border-sm)" }}>
@@ -212,7 +208,6 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
           )}
         </div>
 
-        {/* 🌟 [추가] 팔로워 / 팔로잉 리스트 확인용 모달 구조 구현 */}
         {activeFollowModal && (
             <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4" style={{ zIndex: 999 }}>
               <div className="w-full max-w-sm rounded-2xl p-6 border border-gray-800" style={{ background: "#12121a" }}>
@@ -221,12 +216,7 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
                     <Users size={18} className="text-purple-500" />
                     {activeFollowModal === "followers" ? "팔로워 목록" : "팔로잉 목록"}
                   </h3>
-                  <button
-                      onClick={() => setActiveFollowModal(null)}
-                      className="text-gray-400 hover:text-white text-sm"
-                  >
-                    닫기
-                  </button>
+                  <button onClick={() => setActiveFollowModal(null)} className="text-gray-400 hover:text-white text-sm">닫기</button>
                 </div>
                 <div className="max-h-60 overflow-y-auto space-y-3 pr-1">
                   {(activeFollowModal === "followers" ? followData.followers : followData.followings).length === 0 ? (
@@ -248,7 +238,6 @@ export const ProfilePage = ({ isPremium, onUpgradePremium, userEmail }) => {
               </div>
             </div>
         )}
-
       </div>
   );
 }
