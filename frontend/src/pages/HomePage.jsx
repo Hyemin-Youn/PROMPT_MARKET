@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Star, Download, TrendingUp, Code2, ArrowRight, ShoppingCart, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { searchPrompts } from "../api/prompts.js";
 
 const CATEGORIES = [
   { label: "전체",      value: null       },
@@ -63,16 +64,22 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
     params.append("page", page);
     params.append("size", 20);
 
-    fetch(`http://localhost:8080/api/prompts/search?${params}`, { credentials: "include" })
-        .then(res => res.ok ? res.json() : null)
-        .then(result => {
-          if (result?.data) {
-            setPrompts(result.data.content);
-            setTotalPages(result.data.totalPages);
-            setTotalElements(result.data.totalElements);
-          }
-        })
-        .catch(err => console.error("프롬프트 검색 실패:", err));
+    const query = {};
+    if (debouncedKeyword) query.keyword  = debouncedKeyword;
+    if (activeCategory)   query.category = activeCategory;
+    if (activeAiType)     query.aiType   = activeAiType;
+    query.sort = `${sortType},desc`;
+    query.page = page;
+    query.size = 20;
+    searchPrompts(query)
+      .then(res => {
+        if (res.data?.data) {
+          setPrompts(res.data.data.content);
+          setTotalPages(res.data.data.totalPages);
+          setTotalElements(res.data.data.totalElements);
+        }
+      })
+      .catch(err => console.error("프롬프트 검색 실패:", err));
   }, [debouncedKeyword, activeCategory, activeAiType, sortType, page]);
 
   const handleCategoryChange = (value) => { setActiveCategory(value); setPage(0); };

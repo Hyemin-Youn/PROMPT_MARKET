@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getPrompt, updatePrompt } from "../api/prompts.js";
 
 export const PromptEditPage = () => {
     const { id } = useParams();
@@ -18,30 +19,20 @@ export const PromptEditPage = () => {
     useEffect(() => {
         const fetchPrompt = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/prompts/${id}`, {
-                    method: "GET",
-                    credentials: "include",
-                });
-
-                if (!response.ok) {
-                    alert("프롬프트 정보를 불러오지 못했습니다.");
-                    return;
-                }
-
-                const data = await response.json();
-
+                const res = await getPrompt(id);
+                const data = res.data;
                 setForm({
-                    title: data.title || "",
-                    content: data.content || "",
-                    preview: data.preview || "",
+                    title:        data.title        || "",
+                    content:      data.content      || "",
+                    preview:      data.preview      || "",
                     thumbnailUrl: data.thumbnailUrl || "",
-                    price: data.price || 0,
-                    category: data.category || "BACKEND",
-                    aiType: data.aiType || "GPT4",
+                    price:        data.price        || 0,
+                    category:     data.category     || "BACKEND",
+                    aiType:       data.aiType       || "GPT4",
                 });
             } catch (error) {
                 console.error("상세 조회 에러:", error);
-                alert("서버와 통신할 수 없습니다.");
+                alert("프롬프트 정보를 불러오지 못했습니다.");
             }
         };
 
@@ -61,27 +52,12 @@ export const PromptEditPage = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`http://localhost:8080/api/prompts/${id}?userId=1`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify(form),
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error("수정 실패:", errorText);
-                alert("프롬프트 수정에 실패했습니다.");
-                return;
-            }
-
+            await updatePrompt(id, form);
             alert("프롬프트가 수정되었습니다.");
             navigate(`/detail/${id}`);
         } catch (error) {
             console.error("수정 에러:", error);
-            alert("서버와 통신할 수 없습니다.");
+            alert("프롬프트 수정에 실패했습니다.");
         }
     };
 

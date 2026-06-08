@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, Star, Download, Trash2, Code2, Crown } from "lucide-react";
+import { getLikedPrompts, toggleLike } from "../api/prompts.js";
 
 export const FavoritesPage = ({ onSelectPrompt }) => {
   const [items, setItems] = useState([]);
@@ -10,14 +11,8 @@ export const FavoritesPage = ({ onSelectPrompt }) => {
     const fetchLikedPrompts = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://localhost:8080/api/prompts/liked", {
-          method: "GET",
-          credentials: "include",
-        });
-        if (response.ok) {
-          const result = await response.json();
-          setItems(result.data || []);
-        }
+        const res = await getLikedPrompts();
+        setItems(res.data?.data || []);
       } catch (error) {
         console.error("찜 목록 로드 실패:", error);
       } finally {
@@ -30,10 +25,7 @@ export const FavoritesPage = ({ onSelectPrompt }) => {
   const handleRemove = async (promptId) => {
     setRemoved(promptId);
     try {
-      await fetch(`http://localhost:8080/api/prompts/${promptId}/likes`, {
-        method: "POST",
-        credentials: "include",
-      });
+      await toggleLike(promptId);
       setTimeout(() => {
         setItems(prev => prev.filter(i => i.promptId !== promptId));
         setRemoved(null);
