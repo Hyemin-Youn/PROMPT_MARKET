@@ -87,6 +87,19 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(List.of())); // ✅ Map.of() → List.of()
     }
 
+    @PutMapping("/profile")
+    public ResponseEntity<ApiResponse<String>> updateProfile(
+            @RequestBody Map<String, String> request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+        String nickname = request.get("nickname");
+
+        userService.updateProfile(email, nickname);
+
+        return ResponseEntity.ok(ApiResponse.success("프로필 수정 완료"));
+    }
+
     private String extractCookie(HttpServletRequest request, String name) {
         if (request.getCookies() == null) return null;
         for (Cookie cookie : request.getCookies()) {

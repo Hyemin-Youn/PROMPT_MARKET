@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, Lock, Bell, ShoppingBag, Shield, Eye, EyeOff, AlertTriangle } from "lucide-react";
 
 export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail }) {
@@ -14,7 +14,27 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail 
   });
   const [notifications, setNotifications] = useState({ newComment: true, newFollower: true, purchase: true, promo: false, weekly: true });
 
-  const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
+  const handleSave = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/users/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(accountForm)
+      });
+
+      if (response.ok) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      } else {
+        console.error("저장 실패");
+      }
+    } catch (error) {
+      console.error("저장 중 에러 발생:", error);
+    }
+  };
 
   const NAV = [
     { key: "account",      label: "계정 정보", icon: User       },
@@ -28,6 +48,26 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail 
     border:     "1px solid var(--border)",
     color:      disabled ? "var(--muted-foreground)" : "var(--foreground)",
   });
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/users/me", { credentials: "include" });
+        if (response.ok) {
+          const result = await response.json();
+          setAccountForm({
+            name: result.data.name || "",
+            nickname: result.data.nickname || "",
+            email: result.data.email || "",
+            bio: result.data.bio || ""
+          });
+        }
+      } catch (error) {
+        console.error("사용자 정보 로드 실패:", error);
+      }
+    };
+    fetchUserInfo();
+  }, []);
 
   return (
       <div className="min-h-screen pb-16" style={{ background: "var(--background)" }}>
@@ -58,7 +98,6 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail 
                       </div>
                       <div className="space-y-3">
                         {[
-                          { label: "이름",   key: "name",     placeholder: "이름",             disabled: false },
                           { label: "닉네임", key: "nickname", placeholder: "닉네임",           disabled: false },
                           { label: "이메일", key: "email",    placeholder: "이메일",           disabled: true  },
                         ].map(({ label, key, placeholder, disabled }) => (
@@ -69,11 +108,6 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail 
                               {disabled && <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>이메일은 변경할 수 없습니다</p>}
                             </div>
                         ))}
-                        <div>
-                          <label className="block text-xs mb-1" style={{ color: "var(--muted-foreground)" }}>소개</label>
-                          <textarea value={accountForm.bio} onChange={e => setAccountForm(f => ({ ...f, bio: e.target.value }))} rows={3}
-                                    className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none transition-all" style={inputStyle()} />
-                        </div>
                       </div>
                     </div>
                     <button onClick={handleSave} className="w-full py-2.5 rounded-lg font-medium text-white transition-all"

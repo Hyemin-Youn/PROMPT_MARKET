@@ -355,7 +355,7 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
                                   {(review.username || "U")[0]}
                                 </div>
                                 <div>
-                                  <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>{review.username || "테스트유저"}</p>
+                                  <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>{review.nickname || "테스트유저"}</p>
                                   <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{review.createdAt ? review.createdAt.split('T')[0] : "방금 전"}</p>
                                 </div>
                                 <button onClick={() => openReportModal(review.id, "COMMENT")} className="ml-auto text-xs text-red-500 hover:underline">신고하기</button>
