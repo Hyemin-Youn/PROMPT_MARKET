@@ -21,25 +21,31 @@ public class FollowController {
 
     private final FollowService followService;
 
-    // 팔로우 등록 및 취소
     @PostMapping("/{followingId}/follow")
     public ResponseEntity<ApiResponse<String>> toggleFollow(
             @PathVariable Long followingId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
+        // ✅ null 체크
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
+        }
+
         String email = userDetails.getUsername();
-
         boolean isFollowed = followService.toggleFollow(followingId, email);
-
         String message = isFollowed ? "팔로우 완료" : "팔로우 취소";
 
         return ResponseEntity.ok(ApiResponse.success(message));
     }
 
-    // 팔로윙 목록 가져오기
     @GetMapping("/followings")
     public ResponseEntity<ApiResponse<List<FollowResponseDto>>> getMyFollowings(
             @AuthenticationPrincipal UserDetails userDetails) {
+
+        // ✅ null 체크
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
+        }
 
         String email = userDetails.getUsername();
         List<FollowResponseDto> followings = followService.getFollowings(email);
@@ -47,10 +53,14 @@ public class FollowController {
         return ResponseEntity.ok(ApiResponse.success(followings));
     }
 
-    // 팔로워 목록 가져오기
     @GetMapping("/followers")
     public ResponseEntity<ApiResponse<List<FollowResponseDto>>> getMyFollowers(
             @AuthenticationPrincipal UserDetails userDetails) {
+
+        // ✅ null 체크
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
+        }
 
         String email = userDetails.getUsername();
         List<FollowResponseDto> followers = followService.getFollowers(email);
@@ -58,10 +68,14 @@ public class FollowController {
         return ResponseEntity.ok(ApiResponse.success(followers));
     }
 
-    // 팔로워&팔로잉 수
     @GetMapping("/follow/counts")
     public ResponseEntity<ApiResponse<FollowCountResponseDto>> getMyFollowCounts(
             @AuthenticationPrincipal UserDetails userDetails) {
+
+        // ✅ null 체크
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
+        }
 
         String email = userDetails.getUsername();
         FollowCountResponseDto followCounts = followService.getFollowCounts(email);
@@ -69,14 +83,17 @@ public class FollowController {
         return ResponseEntity.ok(ApiResponse.success(followCounts));
     }
 
-
     @GetMapping("/follow-info")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMyFollowInfo(
             @AuthenticationPrincipal UserDetails userDetails) {
 
+        // ✅ null 체크
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.fail("로그인이 필요합니다."));
+        }
+
         String email = userDetails.getUsername();
 
-        // 팔로워/팔로잉 목록 + 카운트 정보를 합쳐서 반환
         Map<String, Object> response = new HashMap<>();
         response.put("followers", followService.getFollowers(email));
         response.put("followings", followService.getFollowings(email));

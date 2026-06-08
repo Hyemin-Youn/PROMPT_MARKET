@@ -8,10 +8,12 @@ import com.project.backend.domain.prompt.repository.PromptSpecification;
 import com.project.backend.domain.user.entity.PromptUser;
 import com.project.backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,8 @@ public class PromptService {
 
     private final PromptRepository promptRepository;
     private final UserRepository userRepository;
+    @Autowired
+    private JdbcTemplate jdbcTemplate; //
 
     public Page<PromptSearchResponse> search(PromptSearchRequest request, Pageable pageable) {
         Specification<Prompt> spec = Specification
@@ -100,8 +104,20 @@ public class PromptService {
     }
 
     private PromptUser findUser(Long userId) {
+        System.out.println("현재 DB = " +
+                jdbcTemplate.queryForObject(
+                        "SELECT DATABASE()",
+                        String.class));
+
+        System.out.println("요청 userId = " + userId);
+        System.out.println("전체 유저 수 = " + userRepository.count());
+
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "사용자를 찾을 수 없습니다."));
+
     }
 
     private void validateOwner(Prompt prompt, Long userId) {
@@ -124,4 +140,6 @@ public class PromptService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 삭제된 게시글입니다.");
         }
     }
+
+
 }

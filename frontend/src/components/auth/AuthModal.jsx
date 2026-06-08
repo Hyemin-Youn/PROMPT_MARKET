@@ -18,9 +18,10 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
   const [showPw, setShowPw] = useState(false);
   const [showPwConfirm, setShowPwConfirm] = useState(false);
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ email: "", password: "", passwordConfirm: "", name: "", nickname: "" });
+  const [form, setForm] = useState({ email: "", password: "", passwordConfirm: "", nickname: "" });
   const [errors, setErrors] = useState({});
   const [agreed, setAgreed] = useState({ terms: false, privacy: false, marketing: false });
+  const [signupLoading, setSignupLoading] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -46,7 +47,6 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
 
   const validateSignup2 = () => {
     const e = {};
-    if (!form.name) e.name = "이름을 입력하세요";
     if (!form.nickname) e.nickname = "닉네임을 입력하세요";
     else if (form.nickname.length < 2) e.nickname = "닉네임은 2자 이상이어야 합니다";
     if (!agreed.terms || !agreed.privacy) e.terms = "필수 약관에 동의해주세요";
@@ -54,10 +54,55 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
     return Object.keys(e).length === 0;
   };
 
-  const handleLoginSubmit = () => { if (validateLogin()) onSuccess(null, form.email); };
+  const handleLoginSubmit = async () => {
+    if (!validateLogin()) return;
+    try {
+      const response = await fetch("http://localhost:8080/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: form.email, password: form.password }),
+      });
+      if (response.ok) {
+        onSuccess(null, form.email);
+      } else {
+        setErrors({ password: "이메일 또는 비밀번호가 올바르지 않습니다." });
+      }
+    } catch (error) {
+      console.error("로그인 에러:", error);
+      setErrors({ password: "서버와 통신할 수 없습니다." });
+    }
+  };
+
+  const handleSignupSubmit = async () => {
+    if (!validateSignup2()) return;
+    setSignupLoading(true);
+    try {
+      const response = await fetch("http://localhost:8080/api/users/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          nickname: form.nickname,
+        }),
+      });
+      if (response.ok) {
+        setStep(3);
+      } else {
+        const data = await response.json().catch(() => ({}));
+        setErrors({ nickname: data.message || "회원가입에 실패했습니다. 다시 시도해주세요." });
+      }
+    } catch (error) {
+      console.error("회원가입 에러:", error);
+      setErrors({ nickname: "서버와 통신할 수 없습니다." });
+    } finally {
+      setSignupLoading(false);
+    }
+  };
+
   const handleSignupNext = () => {
     if (step === 1 && validateSignup1()) setStep(2);
-    else if (step === 2 && validateSignup2()) setStep(3);
   };
 
   return (
@@ -69,8 +114,8 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
                 <Zap size={14} className="text-white" />
               </div>
               <span className="font-semibold" style={{ color: "var(--foreground)" }}>
-              Prompt<span style={{ color: "var(--brand-violet-light)" }}>Mart</span>
-            </span>
+                Prompt<span style={{ color: "var(--brand-violet-light)" }}>Mart</span>
+              </span>
             </div>
             <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors">
               <X size={16} style={{ color: "var(--muted-foreground)" }} />
@@ -134,8 +179,8 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
                           </div>
                       ))}
                       <span className="text-xs ml-1" style={{ color: "var(--muted-foreground)" }}>
-                    {step === 1 ? "계정 정보" : step === 2 ? "프로필 설정" : "완료"}
-                  </span>
+                        {step === 1 ? "계정 정보" : step === 2 ? "프로필 설정" : "완료"}
+                      </span>
                     </div>
                     {step === 1 && <h2 className="font-semibold" style={{ color: "var(--foreground)", fontSize: "1.1rem" }}>계정 만들기</h2>}
                     {step === 2 && <h2 className="font-semibold" style={{ color: "var(--foreground)", fontSize: "1.1rem" }}>프로필 설정</h2>}
@@ -163,8 +208,6 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
 
                   {step === 2 && (
                       <div className="space-y-3">
-                        <Field icon={User} label="이름" name="name" placeholder="홍길동"
-                               value={form.name} onChange={e => set("name", e.target.value)} error={errors.name} />
                         <Field icon={User} label="닉네임" name="nickname" placeholder="dev_nickname"
                                value={form.nickname} onChange={e => set("nickname", e.target.value)} error={errors.nickname} />
                         <div className="space-y-2 pt-1">
@@ -176,8 +219,8 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
                               <label key={key} className="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" checked={agreed[key] || false} onChange={e => setAgreed(a => ({ ...a, [key]: e.target.checked }))} className="accent-violet-600" />
                                 <span className="text-sm" style={{ color: "var(--foreground)" }}>
-                          {label}{required && <span style={{ color: "var(--destructive)" }}> *</span>}
-                        </span>
+                                  {label}{required && <span style={{ color: "var(--destructive)" }}> *</span>}
+                                </span>
                               </label>
                           ))}
                           {errors.terms && <p className="text-xs flex items-center gap-1" style={{ color: "var(--destructive)" }}><AlertCircle size={11} />{errors.terms}</p>}
@@ -193,27 +236,31 @@ export const AuthModal = ({ mode, onClose, onSuccess, onSwitchMode }) => {
                         <div className="text-center">
                           <h3 className="font-semibold mb-1" style={{ color: "var(--foreground)" }}>가입 완료!</h3>
                           <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
-                            <span style={{ color: "var(--brand-violet-light)" }}>{form.nickname || form.name}</span>님, PromptMart에 오신 걸 환영합니다
+                            <span style={{ color: "var(--brand-violet-light)" }}>{form.nickname}</span>님, PromptMart에 오신 걸 환영합니다
                           </p>
                         </div>
-                        <button onClick={() => onSuccess(null, form.email)} className="w-full py-2.5 rounded-lg font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--gradient-primary)" }}>시작하기</button>
+                        <button onClick={() => onSwitchMode("login")} className="w-full py-2.5 rounded-lg font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--gradient-primary)" }}>로그인하러 가기</button>
                       </div>
                   )}
 
-                  {step < 3 && (
+                  {step === 1 && (
                       <>
                         <button onClick={handleSignupNext} className="w-full py-2.5 rounded-lg font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--gradient-primary)" }}>
-                          {step === 1 ? "다음" : "가입 완료"}
+                          다음
                         </button>
-                        {step === 1 && (
-                            <p className="text-center text-sm" style={{ color: "var(--muted-foreground)" }}>
-                              이미 계정이 있으신가요?{" "}
-                              <button onClick={() => onSwitchMode("login")} className="font-medium hover:underline" style={{ color: "var(--brand-violet-light)" }}>로그인</button>
-                            </p>
-                        )}
-                        {step === 2 && (
-                            <button onClick={() => setStep(1)} className="w-full text-sm text-center hover:underline" style={{ color: "var(--muted-foreground)" }}>이전으로</button>
-                        )}
+                        <p className="text-center text-sm" style={{ color: "var(--muted-foreground)" }}>
+                          이미 계정이 있으신가요?{" "}
+                          <button onClick={() => onSwitchMode("login")} className="font-medium hover:underline" style={{ color: "var(--brand-violet-light)" }}>로그인</button>
+                        </p>
+                      </>
+                  )}
+
+                  {step === 2 && (
+                      <>
+                        <button onClick={handleSignupSubmit} disabled={signupLoading} className="w-full py-2.5 rounded-lg font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--gradient-primary)", opacity: signupLoading ? 0.7 : 1 }}>
+                          {signupLoading ? "가입 중..." : "가입 완료"}
+                        </button>
+                        <button onClick={() => setStep(1)} className="w-full text-sm text-center hover:underline" style={{ color: "var(--muted-foreground)" }}>이전으로</button>
                       </>
                   )}
                 </div>
