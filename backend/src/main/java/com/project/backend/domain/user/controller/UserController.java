@@ -26,6 +26,7 @@ import java.util.Map;
 public class UserController {
 
     private final RefreshTokenService refreshTokenService;
+    private final UserService userService;
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<Map<String, String>>> getMe(
