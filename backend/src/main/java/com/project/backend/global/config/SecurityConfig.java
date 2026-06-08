@@ -5,6 +5,7 @@ import com.project.backend.domain.user.service.CustomUserDetailsService;
 import com.project.backend.global.auth.JwtAuthFilter;
 import com.project.backend.global.auth.JwtTokenProvider;
 import com.project.backend.global.auth.OAuth2LoginSuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,6 +48,13 @@ public class SecurityConfig {
                       .requestMatchers("/favicon.ico", "/error").permitAll()
                       .anyRequest().authenticated()
              )
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("{\"message\":\"인증이 필요합니다.\"}");
+                        })
+                )
 
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(ui -> ui.userService(customOAuth2UserService))
