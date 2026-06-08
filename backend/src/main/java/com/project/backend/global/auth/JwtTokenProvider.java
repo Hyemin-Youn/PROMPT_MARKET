@@ -39,10 +39,11 @@ public class JwtTokenProvider {
     }
 
     // RefreshToken 생성
-    public String generateRefreshToken(String email) {
+    public String generateRefreshToken(String email, String role) {
         return Jwts.builder()
                 .subject(email)
                 .claim("type", "refresh")
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(secretKey)
@@ -54,9 +55,14 @@ public class JwtTokenProvider {
         return getClaims(token).getSubject();
     }
 
-    // Access Token 여부 확인
-    public boolean isAccessToken(String token) {
-        return "access".equals(getClaims(token).get("type", String.class));
+    // role 추출
+    public String getRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    // Refresh Token 여부 확인
+    public boolean isRefreshToken(String token) {
+        return "refresh".equals(getClaims(token).get("type", String.class));
     }
 
     // 토큰 검증

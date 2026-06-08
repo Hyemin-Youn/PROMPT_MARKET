@@ -1,38 +1,27 @@
 import { useState, useEffect } from "react";
 import { User, Lock, Bell, ShoppingBag, Shield, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { getMe, updateProfile } from "../api/users.js";
 
 export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail }) {
   const [activeSection, setActiveSection] = useState("account");
   const [showPw, setShowPw] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [accountForm, setAccountForm] = useState({
-    name: userEmail ? userEmail.split("@")[0] : "",
     nickname: "",
     email: userEmail || "",
-    bio: ""
   });
   const [notifications, setNotifications] = useState({ newComment: true, newFollower: true, purchase: true, promo: false, weekly: true });
 
   const handleSave = async () => {
+    setSaveError("");
     try {
-      const response = await fetch("http://localhost:8080/api/users/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(accountForm)
-      });
-
-      if (response.ok) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2000);
-      } else {
-        console.error("저장 실패");
-      }
-    } catch (error) {
-      console.error("저장 중 에러 발생:", error);
+      await updateProfile(accountForm.nickname);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      setSaveError(err.response?.data?.message || "저장에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -50,23 +39,15 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail 
   });
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/users/me", { credentials: "include" });
-        if (response.ok) {
-          const result = await response.json();
-          setAccountForm({
-            name: result.data.name || "",
-            nickname: result.data.nickname || "",
-            email: result.data.email || "",
-            bio: result.data.bio || ""
-          });
-        }
-      } catch (error) {
-        console.error("사용자 정보 로드 실패:", error);
-      }
-    };
-    fetchUserInfo();
+    getMe()
+      .then(res => {
+        const d = res.data?.data || {};
+        setAccountForm({
+          nickname: d.nickname || "",
+          email:    d.email    || userEmail || "",
+        });
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -110,6 +91,9 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail 
                         ))}
                       </div>
                     </div>
+                    {saveError && (
+                      <p className="text-xs mb-2" style={{ color: "var(--destructive)" }}>{saveError}</p>
+                    )}
                     <button onClick={handleSave} className="w-full py-2.5 rounded-lg font-medium text-white transition-all"
                             style={{ background: saved ? "var(--success)" : "var(--primary)" }}>
                       {saved ? "✓ 저장 완료" : "변경사항 저장"}
@@ -153,22 +137,7 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail 
                     </div>
                     <div className="rounded-xl p-5" style={{ background: "var(--card)", border: "1px solid var(--border-sm)" }}>
                       <h2 className="text-sm font-medium mb-3" style={{ color: "var(--foreground)" }}>로그인 내역</h2>
-                      {[
-                        { device: "Chrome · Windows", location: "서울, 대한민국", time: "방금 전", current: true  },
-                        { device: "Safari · iPhone",  location: "서울, 대한민국", time: "1일 전",  current: false },
-                        { device: "Chrome · MacOS",   location: "서울, 대한민국", time: "3일 전",  current: false },
-                      ].map((session, i) => (
-                          <div key={i} className="flex items-center gap-3 py-3" style={{ borderBottom: i < 2 ? "1px solid var(--border-xs)" : undefined }}>
-                            <Shield size={14} style={{ color: session.current ? "var(--success)" : "var(--muted-foreground)" }} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm" style={{ color: "var(--foreground)" }}>{session.device}</p>
-                              <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{session.location} · {session.time}</p>
-                            </div>
-                            {session.current
-                                ? <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "var(--success-bg-subtle)", color: "var(--success)" }}>현재</span>
-                                : <button className="text-xs" style={{ color: "var(--destructive)" }}>종료</button>}
-                          </div>
-                      ))}
+                      <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>로그인 내역 조회 기능은 준비 중입니다.</p>
                     </div>
                     <button onClick={onLogout} className="w-full py-2.5 rounded-lg text-sm font-medium transition-all hover:bg-white/5" style={{ color: "var(--destructive)", border: "1px solid var(--destructive-border-sm)" }}>로그아웃</button>
                   </div>
@@ -230,15 +199,7 @@ export function SettingsPage({ isPremium, onLogout, onUpgradePremium, userEmail 
                     </div>
                     <div className="rounded-xl p-5" style={{ background: "var(--card)", border: "1px solid var(--border-sm)" }}>
                       <h2 className="text-sm font-medium mb-3" style={{ color: "var(--foreground)" }}>결제 수단</h2>
-                      {isPremium ? (
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-6 rounded flex items-center justify-center text-xs font-bold" style={{ background: "#1a237e", color: "#fff" }}>VISA</div>
-                            <p className="text-sm" style={{ color: "var(--foreground)" }}>**** **** **** 4242</p>
-                            <button className="ml-auto text-xs" style={{ color: "var(--brand-violet-light)" }}>변경</button>
-                          </div>
-                      ) : (
-                          <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>등록된 결제 수단이 없습니다</p>
-                      )}
+                      <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>결제 수단 조회 기능은 준비 중입니다.</p>
                     </div>
                   </div>
               )}

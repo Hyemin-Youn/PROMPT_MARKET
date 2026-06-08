@@ -65,7 +65,7 @@ public class UserService {
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
             throw new CustomException(ErrorCode.INVALID_INPUT);
         String accessToken = jwtTokenProvider.generateToken(user.getEmail(), user.getRole().name());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail(), user.getRole().name());
         refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
         return new TokenResponseDto(accessToken, refreshToken);
     }
@@ -74,6 +74,12 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .map(PromptUser::getNickname)
                 .orElse("");
+    }
+
+    public Long getUserId(String email) {
+        return userRepository.findByEmail(email)
+                .map(PromptUser::getId)
+                .orElse(null);
     }
 
     @Transactional

@@ -14,9 +14,10 @@ import { SignupPage }          from "./pages/SignupPage.jsx";
 import { OAuthCallbackPage }   from "./pages/OAuthCallbackPage.jsx";
 import { OAuthSetupPage }      from "./pages/OAuthSetupPage.jsx";
 import { logout as apiLogout } from "./api/auth.js";
+import { getMe, getPurchases, purchasePrompt } from "./api/users.js";
 
 /* ─── 상세 페이지 래퍼 (useParams 사용) ─── */
-const PromptDetailPageWrapper = ({ onPurchase, isLoggedIn, purchasedPrompts }) => {
+const PromptDetailPageWrapper = ({ onPurchase, isLoggedIn, purchasedPrompts, currentUserId }) => {
   const { id }   = useParams();
   const navigate = useNavigate();
   return (
@@ -26,6 +27,7 @@ const PromptDetailPageWrapper = ({ onPurchase, isLoggedIn, purchasedPrompts }) =
       onPurchase={onPurchase}
       isLoggedIn={isLoggedIn}
       isPurchased={purchasedPrompts.includes(String(id))}
+      currentUserId={currentUserId}
     />
   );
 };
@@ -46,27 +48,52 @@ const AppContent = () => {
   const location = useLocation();
 
   /* 쿠키 기반 인증이므로 localStorage에는 플래그만 저장 */
-  const [isLoggedIn, setIsLoggedIn]             = useState(() => !!localStorage.getItem("isLoggedIn"));
+  const [isLoggedIn, setIsLoggedIn]   = useState(() => !!localStorage.getItem("isLoggedIn"));
+  const [currentUser, setCurrentUser] = useState({ email: "", nickname: "", userId: null });
   const [purchasedPrompts, setPurchasedPrompts] = useState([]);
 
-  /* 로그인 상태일 때 구매 목록 복원 */
+  /* 현재 유저 정보 조회 */
+  const fetchCurrentUser = async () => {
+    try {
+      const res = await getMe();
+      const d = res.data?.data || {};
+      setCurrentUser({
+        email:    d.email    || "",
+        nickname: d.nickname || "",
+        userId:   d.userId   || null,
+      });
+    } catch { /* ignore — cookie 없으면 401 */ }
+  };
+
+  /* 구매 목록 백엔드 동기화 */
+  const syncPurchases = async () => {
+    try {
+      const res = await getPurchases();
+      const items = res.data?.data || [];
+      const ids = items.map(item => String(item.promptId || item.id || item));
+      setPurchasedPrompts(ids);
+    } catch {
+      /* 백엔드 실패 시 localStorage 폴백 */
+      try {
+        const saved = localStorage.getItem("purchasedPrompts");
+        if (saved) setPurchasedPrompts(JSON.parse(saved));
+      } catch { /* ignore */ }
+    }
+  };
+
+  /* 로그인 상태일 때 유저 정보 + 구매 목록 복원 */
   useEffect(() => {
     if (!isLoggedIn) return;
-    try {
-      const saved = localStorage.getItem("purchasedPrompts");
-      if (saved) setPurchasedPrompts(JSON.parse(saved));
-    } catch { /* ignore */ }
-  }, [isLoggedIn]);
-
-  /* 구매 목록 변경 시 저장 */
-  useEffect(() => {
-    localStorage.setItem("purchasedPrompts", JSON.stringify(purchasedPrompts));
-  }, [purchasedPrompts]);
+    fetchCurrentUser();
+    syncPurchases();
+  }, []);
 
   /* 로그인 성공 콜백 — 쿠키는 브라우저가 자동 저장, 플래그만 기록 */
   const handleLoginSuccess = () => {
     localStorage.setItem("isLoggedIn", "true");
     setIsLoggedIn(true);
+    fetchCurrentUser();
+    syncPurchases();
   };
 
   /* 로그아웃 — 서버 쿠키 삭제 + 로컬 상태 초기화 */
@@ -77,17 +104,24 @@ const AppContent = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("purchasedPrompts");
     setIsLoggedIn(false);
+    setCurrentUser({ email: "", nickname: "", userId: null });
     setPurchasedPrompts([]);
     navigate("/");
   };
 
-  /* 구매 처리 */
-  const handlePurchase = (promptId) => {
+  /* 구매 처리 — 백엔드 API 호출 후 로컬 상태 반영 */
+  const handlePurchase = async (promptId) => {
     if (!isLoggedIn) { navigate("/login"); return; }
-    setPurchasedPrompts(prev =>
-      prev.includes(String(promptId)) ? prev : [...prev, String(promptId)]
-    );
-    navigate("/library");
+    try {
+      await purchasePrompt(promptId);
+      setPurchasedPrompts(prev =>
+        prev.includes(String(promptId)) ? prev : [...prev, String(promptId)]
+      );
+      navigate("/library");
+    } catch (err) {
+      const msg = err.response?.data?.message || "구매에 실패했습니다. 다시 시도해주세요.";
+      alert(msg);
+    }
   };
 
   /* 인증 필요 네비게이션 */
@@ -130,6 +164,7 @@ const AppContent = () => {
               onPurchase={handlePurchase}
               isLoggedIn={isLoggedIn}
               purchasedPrompts={purchasedPrompts}
+              currentUserId={currentUser.userId}
             />
           } />
 

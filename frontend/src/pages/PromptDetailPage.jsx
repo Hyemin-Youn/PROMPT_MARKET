@@ -3,12 +3,11 @@ import { Star, Download, Heart, Code2, ChevronLeft, ShoppingCart, CheckCircle2, 
 import { useNavigate } from "react-router-dom";
 import { getPrompt, getComments, postComment, checkIsLiked, toggleLike, deletePrompt, submitReport } from "../api/prompts.js";
 
-export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isPurchased }) => {
+export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isPurchased, currentUserId }) => {
   const [activeTab, setActiveTab] = useState("샘플");
   const [liked, setLiked] = useState(false);
   const [activeRating, setActiveRating] = useState("전체");
   const navigate = useNavigate();
-  const currentUserId = 1;
 
   const [promptData, setPromptData] = useState({
     title: "",
@@ -23,7 +22,9 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
     guideSteps: [],
     content: ""
   });
-  const [isOwner, setIsOwner] = useState(false);
+  const isOwner = currentUserId != null &&
+    promptData.userId != null &&
+    Number(promptData.userId) === Number(currentUserId);
 
   const [reviews, setReviews] = useState([]);
   const [newComment, setNewComment] = useState("");
