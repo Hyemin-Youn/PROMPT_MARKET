@@ -64,6 +64,12 @@ public class PromptUser extends BaseEntity {
     }
 
 
+    // 프로필에서 닉네임 수정
+    public void updateProfile(String nickname) {
+        this.nickname = nickname;
+    }
+
+
     public enum Role { USER, ADMIN }
 
     public enum Status { ACTIVE, SUSPENDED, DELETED }

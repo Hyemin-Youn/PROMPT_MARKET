@@ -69,4 +69,17 @@ public class UserService {
         refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
         return new TokenResponseDto(accessToken, refreshToken);
     }
+
+    @Transactional
+    public void updateProfile(String email, String nickname) {
+        PromptUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 닉네임 변경 시 중복 체크
+        if (!user.getNickname().equals(nickname) && userRepository.existsByNickname(nickname)) {
+            throw new CustomException(ErrorCode.NICKNAME_DUPLICATED);
+        }
+
+        user.updateProfile(nickname);
+    }
 }
