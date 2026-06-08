@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { User, ShoppingBag, Heart, Settings, Copy, CheckCheck, ChevronRight, Download } from "lucide-react";
+import { getPurchases } from "../api/users.js";
 import { ProfilePage } from "./ProfilePage.jsx";
 import { FavoritesPage } from "./FavoritesPage.jsx";
 import { SettingsPage } from "./SettingsPage.jsx";
@@ -27,17 +28,9 @@ export const LibraryPage = ({ purchasedPrompts, onLogout, onSelectPrompt, userEm
     const fetchPurchasedLibrary = async () => {
         setLoading(true);
         try {
-            const response = await fetch("http://localhost:8080/api/purchases", {
-                method: "GET",
-                credentials: "include"
-            });
-            if (response.ok) {
-                const jsonResponse = await response.json();
-                const data = jsonResponse.data || jsonResponse;
-                setPurchasedList(Array.isArray(data) ? data : []);
-            } else {
-                console.error("구매 내역 로드 실패");
-            }
+            const res = await getPurchases();
+            const data = res.data?.data ?? res.data;
+            setPurchasedList(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("라이브러리 통신 에러:", error);
         } finally {
