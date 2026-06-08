@@ -37,13 +37,14 @@ public class RefreshTokenService {
         }
 
         String email = jwtTokenProvider.getEmail(refreshToken);
+        String role  = jwtTokenProvider.getRole(refreshToken);
         String savedToken = redisTemplate.opsForValue().get(REFRESH_PREFIX + email);
 
         if (savedToken == null || !savedToken.equals(refreshToken)) {
             throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        return jwtTokenProvider.generateToken(email, "USER");
+        return jwtTokenProvider.generateToken(email, role != null ? role : "USER");
     }
 
     // 로그아웃 시 삭제

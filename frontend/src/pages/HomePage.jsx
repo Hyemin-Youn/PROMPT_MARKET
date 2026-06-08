@@ -143,7 +143,11 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
                   <h2 className="mb-1" style={{ color: "var(--foreground)", fontWeight: 600 }}>실전에서 검증된 프롬프트</h2>
                   <p className="text-sm" style={{ color: "#ffffff" }}>현직 개발자들이 사용하는 고품질 AI 프롬프트 — 원하는 것만 골라서 구매하세요</p>
                 </div>
-                <button onClick={() => onSelectPrompt(1)} className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90" style={{ background: "var(--primary)" }}>
+                <button
+                  onClick={() => document.getElementById("prompts-section")?.scrollIntoView({ behavior: "smooth" })}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-opacity hover:opacity-90"
+                  style={{ background: "var(--primary)" }}
+                >
                   프롬프트 둘러보기 <ArrowRight size={14} />
                 </button>
               </div>
@@ -181,7 +185,7 @@ export const HomePage = ({ onSelectPrompt, purchasedPrompts }) => {
           </div>
         </section>
 
-        <section className="px-4 pb-16" style={{ position: "relative", zIndex: 1 }}>
+        <section id="prompts-section" className="px-4 pb-16" style={{ position: "relative", zIndex: 1 }}>
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">

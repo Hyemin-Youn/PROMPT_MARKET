@@ -2,7 +2,7 @@ package com.project.backend.domain.like.entity;
 
 import com.project.backend.domain.prompt.entity.Prompt;
 import com.project.backend.domain.user.entity.PromptUser;
-import com.project.backend.global.common.entity.BaseEntity;
+import com.project.backend.global.common.entity.BaseCreatedEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PromptLike extends BaseEntity {
+public class PromptLike extends BaseCreatedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

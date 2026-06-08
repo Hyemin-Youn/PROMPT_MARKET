@@ -4,7 +4,7 @@ export const login = (email, password) =>
   axiosInstance.post("/api/auth/login", { email, password });
 
 export const logout = () =>
-  axiosInstance.post("/api/auth/logout");
+  axiosInstance.post("/api/users/logout");
 
 export const sendCode = ({ email, password, name, nickname }) =>
   axiosInstance.post("/api/auth/send-code", { email, password, name, nickname });

@@ -4,7 +4,12 @@ import com.project.backend.domain.user.dto.EmailVerifyRequestDto;
 import com.project.backend.domain.user.dto.TokenResponseDto;
 import com.project.backend.domain.user.dto.UserRequestDto;
 import com.project.backend.domain.user.service.UserService;
+import com.project.backend.global.auth.RefreshTokenService;
 import com.project.backend.global.common.response.ApiResponse;
+import com.project.backend.global.exception.CustomException;
+import com.project.backend.global.exception.ErrorCode;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +30,7 @@ import java.time.Duration;
 public class AuthController {
 
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/send-code")
     public ResponseEntity<ApiResponse<Void>> sendCode(@Valid @RequestBody UserRequestDto.SignUpRequestDto dto) {
@@ -61,5 +67,33 @@ public class AuthController {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         return ResponseEntity.ok(ApiResponse.success("로그인 성공"));
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<ApiResponse<Void>> reissue(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        String refreshToken = extractRefreshToken(request);
+
+        if (refreshToken == null) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        String newAccessToken = refreshTokenService.reissue(refreshToken);
+
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
+                .httpOnly(true).secure(false).path("/").maxAge(Duration.ofDays(1)).sameSite("Lax").build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        return ResponseEntity.ok(ApiResponse.success("토큰 재발급 성공"));
+    }
+
+    private String extractRefreshToken(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        for (Cookie cookie : request.getCookies()) {
+            if ("refreshToken".equals(cookie.getName())) return cookie.getValue();
+        }
+        return null;
     }
 }

@@ -2,7 +2,7 @@ package com.project.backend.domain.follow.entity;
 
 
 import com.project.backend.domain.user.entity.PromptUser;
-import com.project.backend.global.common.entity.BaseEntity;
+import com.project.backend.global.common.entity.BaseCreatedEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Follow extends BaseEntity {
+public class Follow extends BaseCreatedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "follow_id")

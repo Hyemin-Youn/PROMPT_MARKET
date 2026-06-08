@@ -46,7 +46,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 .orElse("USER");
 
         String accessToken = jwtTokenProvider.generateToken(email, role);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(email);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(email, role);
 
         // Redis에 저장
         refreshTokenService.saveRefreshToken(email, refreshToken);
