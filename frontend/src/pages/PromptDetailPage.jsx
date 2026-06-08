@@ -39,18 +39,8 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
   const fetchPromptDetails = async () => {
     if (!promptId) return;
     try {
-      const response = await fetch(`http://localhost:8080/api/prompts/${promptId}`, {
-        method: "GET",
-        credentials: "include"
-      });
-
-      if (!response.ok) {
-        throw new Error("서버 응답 실패");
-      }
-
-      const data = await response.json();
-      setPromptData(data);
-
+      const res = await getPrompt(promptId);
+      setPromptData(res.data?.data || {});
     } catch (error) {
       console.error("프롬프트 상세 정보 로드 에러:", error);
     }
@@ -154,13 +144,6 @@ export const PromptDetailPage = ({ promptId, onBack, onPurchase, isLoggedIn, isP
   }, [promptId, isLoggedIn]);
 
 
-  useEffect(() => {
-    if (promptData && promptData.userId !== undefined) {
-      const isOwnerMatch = Number(promptData.userId) === currentUserId;
-      setIsOwner(isOwnerMatch);
-      console.log("게시글 당사자 확인 결과:", isOwnerMatch);
-    }
-  }, [promptData, currentUserId]);
 
   return (
       <div className="min-h-screen pb-16" style={{ background: "var(--background)" }}>
